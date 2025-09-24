@@ -40,6 +40,14 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    # Local apps
+    'accounts',
+
+    # Other apps
+    'phonenumber_field',
+    'imagekit',
+    'django_extensions',
 ]
 
 MIDDLEWARE = [
@@ -83,9 +91,6 @@ DATABASES = {
         'PASSWORD': config('DB_PASSWORD'),
         'HOST': config('DB_HOST'),
         'PORT': config('DB_PORT'),
-        'OPTIONS': {
-            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
-        }
     }
 }
 
