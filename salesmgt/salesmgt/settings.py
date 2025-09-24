@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'phonenumber_field',
     'imagekit',
     'django_extensions',
+    'django_tables2',
 ]
 
 MIDDLEWARE = [

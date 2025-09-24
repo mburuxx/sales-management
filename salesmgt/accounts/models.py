@@ -1,15 +1,14 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils.translation import gettext_lazy as _
-
+from django.urls import reverse
 from django_extensions.db.fields import AutoSlugField
 from imagekit.models import ProcessedImageField
 from imagekit.processors import ResizeToFill
 from phonenumber_field.modelfields import PhoneNumberField
 
 
-# Define choices using Python Enums or Class for enhanced clarity and self-documentation
-# This is a common and modern pattern in Django development.
+# Define choices using a Class
 
 class ProfileStatus(models.TextChoices):
     """Choices for the user's account status."""
@@ -24,11 +23,10 @@ class UserRole(models.TextChoices):
     EXECUTIVE = 'EX', _('Executive')
     ADMIN = 'AD', _('Admin')
 
-
+# Models
 class Profile(models.Model):
     """
     Represents a user profile containing personal and account-related details.
-    Each profile is linked to one standard Django User model.
     """
     user = models.OneToOneField(
         User, 
@@ -61,14 +59,14 @@ class Profile(models.Model):
     last_name = models.CharField(
         max_length=30, blank=True, verbose_name='Last Name'
     )
-    # Applying TextChoices directly to the field
+
     status = models.CharField(
         choices=ProfileStatus.choices,
         max_length=12,
         default=ProfileStatus.INACTIVE, # Using the TextChoices constant for default
         verbose_name='Status'
     )
-    # Applying TextChoices directly to the field
+
     role = models.CharField(
         choices=UserRole.choices,
         max_length=12,
@@ -84,7 +82,6 @@ class Profile(models.Model):
         Returns an empty string if the image is not available or not set.
         """
         if self.profile_picture:
-             # The field returns a file object, check if it has a URL
             try:
                 return self.profile_picture.url
             except ValueError:
@@ -104,11 +101,13 @@ class Profile(models.Model):
         verbose_name = 'Profile'
         verbose_name_plural = 'Profiles'
 
+    def get_absolute_url(self):
+        return reverse("profile-detail", kwargs={"slug": self.slug})
+
 
 class Vendor(models.Model):
     """
     Represents a vendor with contact and address information.
-    Uses BigIntegerField for potentially large phone numbers.
     """
     name = models.CharField(max_length=50, verbose_name='Name')
     slug = AutoSlugField(
@@ -116,7 +115,7 @@ class Vendor(models.Model):
         populate_from='name',
         verbose_name='Slug'
     )
-    # Changed to PhoneNumberField for consistency, but kept BigIntegerField for backward compatibility if needed
+
     phone_number = models.BigIntegerField(
         blank=True, null=True, verbose_name='Phone Number'
     )
@@ -135,7 +134,9 @@ class Vendor(models.Model):
         verbose_name = 'Vendor'
         verbose_name_plural = 'Vendors'
 
-
+    def get_absolute_url(self):
+        return reverse("vendor-detail", kwargs={"slug": self.slug})
+    
 class Customer(models.Model):
     """
     Represents a customer in the sales management system, 
@@ -151,30 +152,30 @@ class Customer(models.Model):
     class Meta:
         """Meta options for the Customer model."""
         db_table = 'Customers'
-        verbose_name = 'Customer' # Added verbose_name
-        verbose_name_plural = 'Customers' # Added verbose_name_plural
+        verbose_name = 'Customer'
+        verbose_name_plural = 'Customers'
 
     def __str__(self) -> str:
         """
         Returns the customer's full name.
         """
-        # Improved f-string logic for slightly cleaner concatenation
         return f"{self.first_name} {self.last_name or ''}".strip()
 
     def get_full_name(self) -> str:
         """
         Returns the customer's full name, handling cases where last_name might be None.
         """
-        # Leveraging the built-in method logic for consistency
         return f"{self.first_name} {self.last_name or ''}".strip()
 
     def to_select2(self) -> dict:
         """
         Returns a dictionary formatted for Select2 dropdown widget compatibility.
         """
-        # Changed variable name 'item' to 'select2_data' for better context
         select2_data = {
             "label": self.get_full_name(),
             "value": self.id
         }
         return select2_data
+    
+    def get_absolute_url(self):
+        return reverse("customer-detail", kwargs={"pk": self.pk})

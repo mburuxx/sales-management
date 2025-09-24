@@ -6,3 +6,6 @@ Pillow
 django-phonenumber-field
 phonenumbers
 django-extensions
+django-tables2
+tablib
+django-filter
