@@ -97,7 +97,7 @@ class ProfileListView(LoginRequiredMixin, ExportMixin, SingleTableView):
     Pagination is applied with 10 profiles per page.
     """
     model = Profile
-    template_name = 'accounts/stafflist.html'
+    template_name = 'accounts/staff_list.html'
     context_object_name = 'profiles'
     table_class = ProfileTable
     paginate_by = 10
@@ -111,7 +111,7 @@ class ProfileCreateView(LoginRequiredMixin, CreateView):
     Redirects to the profile list upon successful creation.
     """
     model = Profile
-    template_name = 'accounts/staffcreate.html'
+    template_name = 'accounts/staff_create_update.html'
     fields = ['user', 'role', 'status']
 
     def get_success_url(self):
@@ -134,7 +134,7 @@ class ProfileUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     Redirects to the profile list upon successful update.
     """
     model = Profile
-    template_name = 'accounts/staffupdate.html'
+    template_name = 'accounts/staff_create_update.html'
     fields = ['user', 'role', 'status']
 
     def get_success_url(self):

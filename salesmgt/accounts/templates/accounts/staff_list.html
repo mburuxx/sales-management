@@ -1,0 +1,78 @@
+{% extends "store/base.html" %}
+{% block title %}Staff{% endblock title %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="card">
+        <div class="card-header bg-white py-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <h4 class="mb-0">Staff Management</h4>
+                <div>
+                    <a class="btn btn-outline-secondary btn-sm" href="{% url 'profile-create' %}">
+                        <i class="fas fa-download me-1"></i> Export to Excel
+                    </a>
+                    <a class="btn btn-primary btn-sm ms-2" href="{% url 'profile-create' %}">
+                        <i class="fas fa-user-plus me-1"></i> Add New Staff
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Profile Image</th>
+                            <th>Username</th>
+                            <th>Phone Number</th>
+                            <th>Status</th>
+                            <th>Role</th>
+                            {% if user.profile.role == 'AD' or user.profile.role == 'EX' %}
+                            <th class="text-end">Action</th>
+                            {% endif %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for profile in profiles %}
+                        <tr>
+                            <td>
+                                <img alt="Profile Image" src="{{ profile.profile_picture.url }}" class="rounded-circle" width="40" height="40">
+                            </td>
+                            <td>{{ profile.user.username }}</td>
+                            <td>{{ profile.telephone }}</td>
+                            <td>
+                                {% if profile.status == 'A' %}
+                                <span class="badge bg-primary bg-opacity-10 text-primary">Active</span>
+                                {% elif profile.status == 'OL' %}
+                                <span class="badge bg-secondary bg-opacity-10 text-secondary">On Leave</span>
+                                {% else %}
+                                <span class="badge bg-dark bg-opacity-10 text-dark">Inactive</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if profile.role == 'AD' %} Admin
+                                {% elif profile.role == 'EX' %} Executive
+                                {% else %} Operative
+                                {% endif %}
+                            </td>
+                            <td class="text-end">
+                                {% if user.profile.role == 'AD' or user.profile.role == 'EX' %}
+                                <a class="btn btn-outline-primary btn-sm" href="{% url 'profile-update' profile.id %}">
+                                    <i class="fas fa-pen"></i>
+                                </a>
+                                {% endif %}
+                                {% if user.profile.role == 'AD' %}
+                                <a class="btn btn-outline-secondary btn-sm ms-2" href="{% url 'profile-delete' profile.id %}">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
