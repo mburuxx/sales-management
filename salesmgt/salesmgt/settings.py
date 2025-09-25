@@ -43,6 +43,7 @@ INSTALLED_APPS = [
 
     # Local apps
     'accounts',
+    'store',
 
     # Other apps
     'phonenumber_field',

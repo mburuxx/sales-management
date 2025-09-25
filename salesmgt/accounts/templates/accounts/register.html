@@ -1,132 +1,156 @@
-{% load crispy_forms_tags %}{% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Register | LogistX</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
-        rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
-        crossorigin="anonymous"/>
-    <style>
-        body {
-            background-color: #f5f7fa;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
+<!-- Bootstrap CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<!-- Font Awesome for icons -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+<style>
+    .sidebar {
+        width: 250px;
+        background-color: #343a40;
+        color: #fff;
+        position: fixed;
+        top: 0;
+        bottom: 0; /* Extend to the bottom of the viewport */
+        display: flex;
+        flex-direction: column; /* Stack children vertically */
+    }
 
-        .register-container {
-            width: 100%;
-            max-width: 480px;
-            padding: 25px;
-        }
+    .sidebar-header {
+        background-color: #212529;
+    }
 
-        .card-form {
-            background-color: #fff;
-            border: 1px solid #dee2e6;
-            border-radius: 10px;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
-            padding: 35px;
-        }
+    .nav-container {
+        flex: 1; /* Take up remaining space */
+        overflow-y: auto; /* Enable vertical scrolling */
+        padding: 5px; /* Add some padding */
+    }
 
-        .brand-title {
-            font-size: 2.2rem;
-            font-weight: 700;
-            color: #2c3e50;
-            margin-bottom: 10px;
-        }
+    .nav-link {
+        color: #adb5bd;
+    }
 
-        .brand-title .highlight {
-            color: #0d6efd; /* Bootstrap primary */
-        }
+    .nav-link.active {
+        background-color: #495057;
+        color: #fff;
+    }
 
-        .subtitle {
-            font-size: 1rem;
-            font-weight: 400;
-            color: #6c757d;
-        }
+    .dropdown-menu {
+        background-color: #495057;
+    }
 
-        .btn-register {
-            background-color: #0d6efd;
-            border-color: #0d6efd;
-            color: #fff;
-            font-weight: 600;
-            padding: 12px;
-            font-size: 1rem;
-        }
+    .dropdown-item {
+        color: #adb5bd;
+    }
 
-        .btn-register:hover {
-            background-color: #0b5ed7;
-            border-color: #0a58ca;
-        }
+    .dropdown-item.active, .dropdown-item:hover {
+        background-color: #6c757d;
+        color: #fff;
+    }
 
-        .auth-message {
-            font-size: 0.9rem;
-            margin-top: 20px;
-            color: #6c757d;
-            text-align: center;
-        }
+    .sidebar-footer {
+        background-color: #212529;
+        text-align: center;
+        padding: 10px;
+    }
+</style>
+<aside class="sidebar position-fixed top-0 left-0 overflow-auto h-100 bg-dark text-light" id="show-side-navigation1">
+    <!-- Close Button -->
+    <button class="btn btn-dark d-md-none d-lg-none position-absolute top-0 end-0 mt-2 me-2 rounded-circle" data-close="show-side-navigation1" aria-label="Close">
+        <i class="fa fa-times text-white"></i>
+    </button>
 
-        .auth-message a {
-            color: #0d6efd;
-            font-weight: 600;
-            text-decoration: none;
-        }
-
-        .auth-message a:hover {
-            text-decoration: underline;
-        }
-
-        .alert {
-            font-size: 0.95rem;
-        }
-    </style>
-</head>
-<body>
-    <div class="register-container">
-        <div class="card-form">
-            <div class="text-center mb-4">
-                <div class="brand-title">Logist<span class="highlight">X</span></div>
-                <div class="subtitle">Create Your Business Account</div>
+    <!-- Sidebar Header -->
+    <div class="sidebar-header d-flex align-items-center px-3 py-4 border-bottom border-secondary">
+        <a href="{% url 'user-profile' %}" class="d-flex align-items-center text-decoration-none text-light">
+            <img class="rounded-circle img-fluid" id="sidebar-img" width="45" src="{{ request.user.profile.profile_picture.url }}" alt="Profile Picture" />
+            <div class="ms-3">
+                <h5 class="fs-6 mb-0">
+                    {{ request.user.username }}{% if request.user.profile.role == 'AD' %} <i class="fa-solid fa-circle-check text-success"></i>{% endif %}
+                </h5>
+                <span class="badge bg-success text-light">
+                    {% if request.user.profile.role == 'AD' %}
+                        Admin
+                    {% elif request.user.profile.role == 'EX' %}
+                        Executive
+                    {% else %}
+                        Operative
+                    {% endif %}
+                </span>
             </div>
-
-            {% if messages %}
-                {% for message in messages %}
-                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                        {{ message }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                {% endfor %}
-            {% endif %}
-
-            {% if form.non_field_errors %}
-                <div class="alert alert-danger">
-                    {% for error in form.non_field_errors %}
-                        <p class="mb-0">{{ error }}</p>
-                    {% endfor %}
-                </div>
-            {% endif %}
-
-            <form method="POST" novalidate>
-                {% csrf_token %}
-                {{ form|crispy }}
-                <button type="submit" class="btn btn-register w-100 mt-3">
-                    Register Account
-                </button>
-            </form>
-
-            <div class="auth-message">
-                Already have an account?
-                <a href="{% url 'user-login' %}">Sign In</a>
-            </div>
-        </div>
+        </a>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtuvF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
-        crossorigin="anonymous"></script>
-</body>
-</html>
+    <!-- Navigation Container -->
+    <div class="nav-container">
+        <!-- Navigation Links -->
+        <ul class="nav flex-column mt-3">
+            <li class="nav-item mb-2">
+                <a class="nav-link text-light {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" href="{% url 'dashboard' %}">
+                    <i class="fa fa-tachometer-alt fa-fw me-2"></i> Dashboard
+                </a>
+            </li>
+            <li class="nav-item mb-2 dropdown">
+                <a class="nav-link text-light {% if request.resolver_match.url_name == 'productslist' %}active{% endif %} dropdown-toggle" href="#" id="productsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fa fa-folder me-2"></i> Products
+                </a>
+                <ul class="dropdown-menu bg-dark border-0" aria-labelledby="productsDropdown">
+                    <li><a class="dropdown-item text-light {% if request.resolver_match.url_name == 'productslist' %}active{% endif %}" href="{% url 'productslist' %}">All Products</a></li>
+                    <li><a class="dropdown-item text-light" href="{% url 'category-list' %}">Categories</a></li>
+                </ul>
+            </li>
+            <li class="nav-item mb-2">
+                <a class="nav-link text-light {% if request.resolver_match.url_name == 'saleslist' %}active{% endif %}" href="{% url 'saleslist' %}">
+                    <i class="fa fa-shopping-bag fa-fw me-2"></i> Sales Orders
+                </a>
+            </li>
+            <li class="nav-item mb-2">
+                <a class="nav-link text-light {% if request.resolver_match.url_name == 'purchaseslist' %}active{% endif %}" href="{% url 'purchaseslist' %}">
+                    <i class="fa fa-shopping-cart me-2"></i> Purchase Orders
+                </a>
+            </li>
+            <li class="nav-item mb-2">
+                <a class="nav-link text-light {% if request.resolver_match.url_name == 'deliveries' %}active{% endif %}" href="{% url 'deliveries' %}">
+                    <i class="fa-solid fa-box me-2"></i> Package
+                </a>
+            </li>
+            <li class="nav-item mb-2">
+                <a class="nav-link text-light {% if request.resolver_match.url_name == 'invoicelist' %}active{% endif %}" href="{% url 'invoicelist' %}">
+                    <i class="fa-solid fa-receipt me-2"></i> Invoices
+                </a>
+            </li>
+            <li class="nav-item mb-2">
+                <a class="nav-link text-light {% if request.resolver_match.url_name == 'bill_list' %}active{% endif %}" href="{% url 'bill_list' %}">
+                    <i class="fa-solid fa-file-invoice me-2"></i> Bills
+                </a>
+            </li>
+            <li class="nav-item mb-2 dropdown">
+                <a class="nav-link text-light {% if request.resolver_match.url_name == 'profile_list' or request.resolver_match.url_name == 'customer_list' or request.resolver_match.url_name == 'vendor-list' %} active{% endif %} dropdown-toggle" href="#" id="accountsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fa fa-users me-2"></i> Accounts
+                </a>
+                <ul class="dropdown-menu bg-dark border-0" aria-labelledby="accountsDropdown">
+                    <li><a class="dropdown-item text-light {% if request.resolver_match.url_name == 'profile_list' %}active{% endif %}" href="{% url 'profile_list' %}">All Staff</a></li>
+                    <li><a class="dropdown-item text-light {% if request.resolver_match.url_name == 'customer_list' %}active{% endif %}" href="{% url 'customer_list' %}">Customers</a></li>
+                    <li><a class="dropdown-item text-light {% if request.resolver_match.url_name == 'customer_list' %}active{% endif %}" href="{% url 'vendor-list' %}">Vendors</a></li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Sidebar Footer -->
+    <div class="sidebar-footer position-absolute bottom-0 w-100 text-center py-3 bg-dark border-top border-secondary">
+        <form method="post" action="{% url 'user-logout' %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger btn-sm w-75">
+                <i class="fa fa-sign-out me-2"></i> Logout
+            </button>
+        </form>
+    </div>
+</aside>
+
+<!-- Bootstrap Bundle with Popper.js -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Explicitly initializing Bootstrap dropdowns if needed
+    document.querySelectorAll('.dropdown-toggle').forEach(function(element) {
+        new bootstrap.Dropdown(element);
+    });
+</script>
