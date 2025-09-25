@@ -1,0 +1,154 @@
+{% load crispy_forms_tags %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Edit Profile</title>
+    
+    <!-- Bootstrap CSS CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" 
+          rel="stylesheet" 
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" 
+          crossorigin="anonymous" />
+    
+    <style>
+        /* Font and general styles */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-size: 16px;
+            color: #333;
+            background-color: #f8f9fa;
+            min-height: 100vh;
+            padding-top: 40px;
+            padding-bottom: 40px;
+        }
+
+        h5 {
+            font-weight: 100;
+            color: #ffffff;
+        }
+
+        h5 {
+            font-weight: 600;
+            letter-spacing: 0.03em;
+            color: #0d6efd; /* Bootstrap primary blue */
+        }
+
+        .form-label {
+            font-weight: 600;
+            font-size: 1rem;
+            color: #222;
+        }
+
+        .form-text {
+            font-size: 0.85rem;
+            color: #6c757d; /* Bootstrap muted */
+        }
+
+        /* Card styles */
+        .card {
+            box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15);
+            border: none;
+            border-radius: 0.5rem;
+        }
+
+        .card-header {
+            background-color: #0d6efd;
+            color: white;
+            text-align: center;
+            padding: 1.25rem 1rem;
+            border-top-left-radius: 0.5rem;
+            border-top-right-radius: 0.5rem;
+        }
+
+        /* Input focus */
+        input:focus, select:focus, textarea:focus {
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+            border-color: #0d6efd;
+        }
+
+        /* Button */
+        .btn-primary {
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background-color: #0a58ca;
+            border-color: #0a58ca;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            
+            <div class="card shadow-lg border-0">
+                <div class="card-header">
+                    <h4 class="mb-0">Update Your Business Profile</h4>
+                </div>
+                <div class="card-body p-4">
+                    
+                    <form method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        <h5 class="mb-3 mt-2 border-bottom pb-2">Account Credentials</h5>
+                        
+                        <div class="mb-4">
+                            {{ u_form.username|as_crispy_field }}
+                        </div>
+                        <div class="mb-4">
+                            {{ u_form.email|as_crispy_field }}
+                        </div>
+
+                        <h5 class="mb-3 mt-4 border-bottom pb-2">Personal & Contact Info</h5>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-4">
+                                {{ p_form.first_name|as_crispy_field }}
+                            </div>
+                            <div class="col-md-6 mb-4">
+                                {{ p_form.last_name|as_crispy_field }}
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Secondary Email</label>
+                            {{ p_form.email|as_crispy_field }} 
+                            <small class="form-text">For non-critical notifications.</small>
+                        </div>
+                        
+                        <div class="mb-4">
+                            {{ p_form.telephone|as_crispy_field }}
+                        </div>
+
+                        <h5 class="mb-3 mt-4 border-bottom pb-2">Profile Picture</h5>
+                        
+                        <div class="mb-4">
+                            {{ p_form.profile_picture|as_crispy_field }}
+                            <small class="form-text">Upload a clear, professional photo.</small>
+                        </div>
+                        
+                        <div class="d-grid gap-2 mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                Save Changes
+                            </button>
+                        </div>
+                    </form>
+                </div> 
+            </div> 
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap JS Bundle CDN -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" 
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtuvF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" 
+        crossorigin="anonymous"></script>
+
+</body>
+</html>
