@@ -7,7 +7,7 @@ from django.views.decorators.http import require_POST
 
 # Authentication and permissions
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin, PermissionRequiredMixin
 
 # Class-based views
 from django.views.generic import (
@@ -249,7 +249,7 @@ class VendorListView(LoginRequiredMixin, ListView):
     paginate_by = 10
 
 
-class VendorCreateView(LoginRequiredMixin, CreateView):
+class VendorCreateView(LoginRequiredMixin, CreateView, PermissionRequiredMixin):
     model = Vendor
     form_class = VendorForm
     template_name = 'accounts/vendor_form.html'
