@@ -33,22 +33,21 @@ urlpatterns = [
     # Profile URLs
     path('profiles/', ProfileListView.as_view(), name='profile_list'),
     path('new-profile/', ProfileCreateView.as_view(), name='profile-create'),
-    path('profile/<slug:slug>/update/', ProfileUpdateView.as_view(), name='profile-update'),
-    path('profile/<slug:slug>/delete/', ProfileDeleteView.as_view(), name='profile-delete'),
+    path('profile/<int:pk>/update/', ProfileUpdateView.as_view(), name='profile-update'),
+    path('profile/<int:pk>/delete/', ProfileDeleteView.as_view(), name='profile-delete'),
 
     # Customer URLs
     path('customers/', CustomerListView.as_view(), name='customer_list'),
     path('customers/create/', CustomerCreateView.as_view(), name='customer_create'),
-    path('customers/<int:pk>/update/', CustomerUpdateView.as_view(), name='customer_update'),
-    path('customers/<int:pk>/delete/', CustomerDeleteView.as_view(), name='customer_delete'),
+    path('customers/<int:pk>/update/', CustomerUpdateView.as_view(), name='customer-update'),
+    path('customers/<int:pk>/delete/', CustomerDeleteView.as_view(), name='customer-delete'),
     path('get_customers/', get_customers, name='get_customers'),
 
     # Vendor URLs
     path('vendors/', VendorListView.as_view(), name='vendor-list'),
     path('vendors/new/', VendorCreateView.as_view(), name='vendor-create'),
-    path('vendors/<slug:slug>/update/', VendorUpdateView.as_view(), name='vendor-update'),
-    path('vendors/<slug:slug>/delete/', VendorDeleteView.as_view(), name='vendor-delete'),
-
+    path('vendors/<int:pk>/update/', VendorUpdateView.as_view(),name='vendor-update'),
+    path('vendors/<int:pk>/delete/', VendorDeleteView.as_view(),name='vendor-delete'),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -38,10 +38,10 @@
                             <td>{{ customer.phone }}</td>
                             <td>{{ customer.loyalty_points }}</td>
                             <td class="text-end">
-                                <a href="{% url 'customer_update' customer.pk %}" class="btn btn-outline-primary btn-sm">
+                                <a href="{% url 'customer-update' customer.pk %}" class="btn btn-outline-primary btn-sm">
                                     <i class="fas fa-edit"></i>
                                 </a>
-                                <a href="{% url 'customer_delete' customer.pk %}" class="btn btn-outline-secondary btn-sm">
+                                <a href="{% url 'customer-delete' customer.pk %}" class="btn btn-outline-secondary btn-sm">
                                     <i class="fas fa-trash-alt"></i>
                                 </a>
                             </td>

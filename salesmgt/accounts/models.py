@@ -36,7 +36,7 @@ class Profile(models.Model):
     slug = AutoSlugField(
         unique=True,
         verbose_name='Account ID',
-        populate_from='email',
+        populate_from='user__email',
         help_text="Unique identifier for the profile, populated from the email address."
     )
     profile_picture = ProcessedImageField(
@@ -102,7 +102,7 @@ class Profile(models.Model):
         verbose_name_plural = 'Profiles'
 
     def get_absolute_url(self):
-        return reverse("profile-detail", kwargs={"slug": self.slug})
+        return reverse("profile-update", kwargs={"slug": self.slug})
 
 
 class Vendor(models.Model):
@@ -135,7 +135,7 @@ class Vendor(models.Model):
         verbose_name_plural = 'Vendors'
 
     def get_absolute_url(self):
-        return reverse("vendor-detail", kwargs={"slug": self.slug})
+        return reverse("vendor-update", kwargs={"slug": self.slug})
     
 class Customer(models.Model):
     """
@@ -178,4 +178,4 @@ class Customer(models.Model):
         return select2_data
     
     def get_absolute_url(self):
-        return reverse("customer-detail", kwargs={"pk": self.pk})
+        return reverse("customer-update", kwargs={"pk": self.pk})
