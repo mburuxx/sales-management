@@ -42,7 +42,7 @@ from accounts.models import Profile, Vendor
 #from transactions.models import Sale
 from .models import Category, Item, Delivery
 from .forms import ItemForm, CategoryForm, DeliveryForm
-#from .tables import ItemTable
+from .tables import ItemTable
 
 
 @login_required
@@ -105,7 +105,7 @@ class ProductListView(LoginRequiredMixin, ExportMixin, tables.SingleTableView):
     """
 
     model = Item
-    #table_class = ItemTable
+    table_class = ItemTable
     template_name = "store/productslist.html"
     context_object_name = "items"
     paginate_by = 10
@@ -169,7 +169,7 @@ class ProductCreateView(LoginRequiredMixin, CreateView):
     success_url = "/products"
 
     def test_func(self):
-        # item = Item.objects.get(id=pk)
+        #item = Item.objects.get(id=pk)
         if self.request.POST.get("quantity") < 1:
             return False
         else:
