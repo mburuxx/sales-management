@@ -82,9 +82,7 @@ class Delivery(models.Model):
     """
     Represents a delivery of an item to a customer.
     """
-    item = models.ForeignKey(
-        Item, blank=True, null=True, on_delete=models.SET_NULL
-    )
+    item = models.ForeignKey(Item, blank=True, null=True, on_delete=models.SET_NULL)
     customer_name = models.CharField(max_length=30, blank=True, null=True)
     phone_number = PhoneNumberField(blank=True, null=True)
     location = models.CharField(max_length=20, blank=True, null=True)
