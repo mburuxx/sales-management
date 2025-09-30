@@ -2,9 +2,13 @@ from django import forms
 from .models import Item, Category, Delivery
 
 
+from django import forms
+from .models import Item
+
 class ItemForm(forms.ModelForm):
     """
-    A form for creating or updating an Item in the inventory.
+    A form for creating or updating an Item in the inventory,
+    with custom validation for quantity and price.
     """
     class Meta:
         model = Item
@@ -41,6 +45,27 @@ class ItemForm(forms.ModelForm):
             ),
             'vendor': forms.Select(attrs={'class': 'form-control'}),
         }
+
+    def clean_quantity(self):
+        """ Validation for the quantity field. """
+        # Get the value submitted by the user.
+        quantity = self.cleaned_data.get('quantity')
+
+        # Check if the quantity is less than 1.
+        if quantity is not None and quantity < 1:
+            raise forms.ValidationError("The quantity must be 1 or greater.")
+
+        # If the validation passes, you must return the cleaned value.
+        return quantity
+
+    def clean_price(self):
+        """ Custom validation to ensure the price is not negative. """
+        price = self.cleaned_data.get('price')
+
+        if price is not None and price < 0:
+            raise forms.ValidationError("The price cannot be negative.")
+
+        return price
 
 
 class CategoryForm(forms.ModelForm):

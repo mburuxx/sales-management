@@ -63,7 +63,7 @@ class Profile(models.Model):
     status = models.CharField(
         choices=ProfileStatus.choices,
         max_length=12,
-        default=ProfileStatus.INACTIVE, # Using the TextChoices constant for default
+        default=ProfileStatus.INACTIVE,
         verbose_name='Status'
     )
 
@@ -72,8 +72,19 @@ class Profile(models.Model):
         max_length=12,
         blank=True,
         null=True,
-        verbose_name='Role'
+        verbose_name='Role',
+        default=UserRole.OPERATIVE,
     )
+
+    def get_user_role(self):
+        """Safe shortcut to get role from profile."""
+        if hasattr(self, "profile") and self.profile.role:
+            return self.profile.role
+        return None
+
+    User.add_to_class("get_role", get_user_role)
+
+    
 
     @property
     def image_url(self):

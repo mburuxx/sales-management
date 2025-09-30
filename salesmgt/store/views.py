@@ -43,6 +43,8 @@ from accounts.models import Profile, Vendor
 from .models import Category, Item, Delivery
 from .forms import ItemForm, CategoryForm, DeliveryForm
 from .tables import ItemTable
+from .mixins import PermissionDeniedMixin
+from accounts.models import UserRole
 
 
 @login_required
@@ -153,7 +155,7 @@ class ProductDetailView(LoginRequiredMixin, FormMixin, DetailView):
         return reverse("product-detail", kwargs={"slug": self.object.slug})
 
 
-class ProductCreateView(LoginRequiredMixin, CreateView):
+class ProductCreateView(LoginRequiredMixin, PermissionDeniedMixin, CreateView):
     """
     View class to create a new product.
 
@@ -167,14 +169,17 @@ class ProductCreateView(LoginRequiredMixin, CreateView):
     model = Item
     template_name = "store/product_create.html"
     form_class = ItemForm
-    success_url = "/products/"
+    success_url = reverse_lazy("productslist")
+
+    permission_denied_message = "You must have admin status to create inventory products."
 
     def test_func(self):
-        #item = Item.objects.get(id=pk)
-        if self.request.POST.get("quantity") < 1:
-            return False
-        else:
-            return True
+        """
+        Required by UserPassesTestMixin. Checks if the user is a superuser OR staff.
+        """
+        return self.request.user.get_role() in [UserRole.ADMIN, UserRole.EXECUTIVE]
+
+    
 
 
 class ProductUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
@@ -189,15 +194,33 @@ class ProductUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     """
 
     model = Item
-    template_name = "store/productupdate.html"
+    template_name = "store/product_update.html"
     form_class = ItemForm
-    success_url = "/products"
+    success_url = reverse_lazy("productslist") 
+
+    # Custom permission handling
+    permission_denied_message = "You must have admin status to update inventory items."
+    
+    # 2. Prevent raising 403, allowing handle_no_permission to execute
+    raise_exception = False 
 
     def test_func(self):
-        if self.request.user.is_superuser:
-            return True
-        else:
-            return False
+        # Only allow superusers to access this page
+        return self.request.user.is_superuser
+
+    def handle_no_permission(self):
+        """
+        Called when the user fails the test_func. 
+        Instead of 403, render a custom message template that redirects.
+        """
+        context = {
+            'message': self.permission_denied_message,
+            'redirect_url': reverse_lazy('dashboard'), # Redirect to your dashboard URL name
+            'redirect_delay': 3 # Redirect after 3 seconds
+        }
+        # Use render() to display the custom template with the message/redirect info
+        return render(self.request, 'store/permission_denied.html', context, status=403)
+
 
 
 class ProductDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
@@ -212,7 +235,7 @@ class ProductDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 
     model = Item
     template_name = "store/productdelete.html"
-    success_url = "/products"
+    success_url = "/products/"
 
     def test_func(self):
         if self.request.user.is_superuser:
