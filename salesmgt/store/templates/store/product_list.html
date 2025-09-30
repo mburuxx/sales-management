@@ -1,0 +1,252 @@
+{% extends "store/base.html" %}
+{% load static %}
+{% load render_table from django_tables2 %}
+{% load querystring from django_tables2 %}
+
+{% block title %}Products{% endblock title %}
+
+{% block stylesheets %}
+<style>
+    /* Table Styling */
+    .table-container {
+        padding: 0 1rem; /* Adjust padding for the table area */
+    }
+
+    .custom-table {
+        border-collapse: separate;
+        border-spacing: 0;
+        border: none;
+        box-shadow: var(--card-shadow);
+        border-radius: 0.5rem;
+        overflow: hidden; /* Important for rounding corners */
+    }
+
+    .custom-table thead th {
+        background-color: var(--sidebar-header-bg); /* Dark header for a bold look */
+        color: #fff;
+        font-weight: 600;
+        border: none;
+        padding: 1rem 1rem;
+        vertical-align: middle;
+        text-align: left;
+    }
+
+    .custom-table tbody tr {
+        transition: background-color 0.15s ease-in-out;
+    }
+
+    .custom-table tbody tr:hover {
+        background-color: #f0f4f8; /* Subtle hover color */
+    }
+
+    .custom-table tbody td {
+        background-color: #fff;
+        border-top: 1px solid #e5e7eb; /* Light separator */
+        padding: 0.75rem 1rem;
+        vertical-align: middle;
+    }
+    
+    .custom-table .action-col {
+        min-width: 160px; /* Ensure action buttons have enough space */
+    }
+
+    /* Table links (sortable headers) */
+    .custom-table thead th a {
+        color: #fff;
+        text-decoration: none;
+        display: block;
+        padding-right: 1.5rem; /* Space for the sort icon */
+    }
+    
+    .custom-table thead th .fa-sort {
+        margin-left: 0.5rem;
+        font-size: 0.8em;
+    }
+
+    /* Link style for product names in the table body */
+    .product-name-link {
+        color: var(--primary-color);
+        font-weight: 500;
+        text-decoration: none;
+        transition: color 0.15s ease-in-out;
+    }
+    .product-name-link:hover {
+        color: #0056b3; /* Darker primary color on hover */
+        text-decoration: underline;
+    }
+
+
+    /* Pagination Styling */
+    .pagination .page-item.active .page-link {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+        color: #fff;
+    }
+
+    .pagination .page-link {
+        color: var(--primary-color);
+        transition: background-color 0.2s;
+    }
+
+    .pagination .page-link:hover {
+        background-color: rgba(13, 110, 253, 0.1);
+    }
+    
+    /* Search Bar Input Group */
+    .search-input-group .form-control {
+        border-top-right-radius: 0 !important;
+        border-bottom-right-radius: 0 !important;
+        border: 1px solid #ced4da; /* Ensure a visible border */
+    }
+    
+    .search-input-group .btn {
+        border-top-left-radius: 0 !important;
+        border-bottom-left-radius: 0 !important;
+        /* Use primary color for the search button for consistency */
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+        color: #fff;
+    }
+    .search-input-group .btn:hover {
+        background-color: #0b5ed7;
+        border-color: #0b5ed7;
+    }
+    
+</style>
+{% endblock stylesheets %}
+
+{% block content %}
+<div class="container-fluid">
+
+    <!-- Header Section (Sleek Card) -->
+    <div class="my-4">
+        <div class="card p-4">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <h4 class="display-6 mb-0" style="color: var(--primary-color);">Products</h4>
+                </div>
+                <div class="col-md-6 d-flex justify-content-end gap-2">
+                    <a class="btn btn-primary btn-sm rounded-pill shadow-sm" href="{% url 'product-create' %}">
+                        <i class="fa-solid fa-plus me-1"></i> Create New Product
+                    </a>
+                    <a class="btn btn-outline-secondary btn-sm rounded-pill shadow-sm" href="{% querystring '_export'='xlsx' %}">
+                        <i class="fa-solid fa-download me-1"></i> Export to Excel
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Search Form -->
+            <form class="input-group mt-4 search-input-group" style="max-width: 500px;" role="search" id="searchform" action="{% url 'item_search_list_view' %}" method="get" accept-charset="utf-8">
+                <input id="searchbox" name="q" type="text" class="form-control rounded-start-pill" placeholder="Find products">
+                <button class="btn" type="submit">
+                    <i class="fa-solid fa-search"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Table Section -->
+    <div class="table-container">
+        <div class="card p-0 custom-table-wrapper">
+            <table class="table custom-table mb-0">
+                <thead class="thead-dark">
+                    <tr>
+                        <th scope="col">ID</th>
+                        <th scope="col">Name</th>
+                        <th scope="col">Category</th>
+                        <th scope="col">Quantity</th>
+                        <th scope="col">Price</th>
+                        <th scope="col">Expiring Date</th>
+                        <th scope="col">Vendor</th>
+                        <th scope="col" class="action-col text-center">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in items %}
+                    <tr>
+                        <th scope="row">{{ item.id }}</th>
+                        <td>
+                            <!-- THIS IS THE LINK TO THE DETAIL PAGE -->
+                            <a href="{% url 'product-detail' item.slug %}" class="product-name-link">
+                                {{ item.name }}
+                            </a>
+                        </td>
+                        <td>{{ item.category }}</td>
+                        <td>
+                            {% if item.quantity <= 10 %}
+                                <span class="text-danger fw-bold">{{ item.quantity }}</span>
+                            {% else %}
+                                {{ item.quantity }}
+                            {% endif %}
+                        </td>
+                        <td>{{ item.price }}</td>
+                        <td>{{ item.expiring_date|date:"Y-m-d" }}</td>
+                        <td>{{ item.vendor }}</td>
+                        <td class="action-col text-center">
+                            <a class="btn btn-outline-primary btn-sm me-2" href="{% url 'product-update' item.slug %}">
+                                <i class="fa-solid fa-pen"></i> Edit
+                            </a>
+                            <a class="btn btn-outline-danger btn-sm" href="{% url 'product-delete' item.slug %}">
+                                <i class="fa-solid fa-trash"></i> Delete
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="8" class="text-center text-muted py-4">No products found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Pagination -->
+    {% if is_paginated %}
+    <nav aria-label="Page navigation" class="mt-4 pb-4">
+        <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+            {% else %}
+            <li class="page-item disabled">
+                <span class="page-link" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </span>
+            </li>
+            {% endif %}
+            
+            {% for i in paginator.page_range %}
+            {% if page_obj.number == i %}
+            <li class="page-item active" aria-current="page">
+                <span class="page-link">{{ i }} <span class="visually-hidden">(current)</span></span>
+            </li>
+            {% else %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ i }}">{{ i }}</a>
+            </li>
+            {% endif %}
+            {% endfor %}
+            
+            {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+            {% else %}
+            <li class="page-item disabled">
+                <span class="page-link" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </span>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+
+</div>
+{% endblock content %}

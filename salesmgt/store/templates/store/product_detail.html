@@ -1,0 +1,146 @@
+{% extends "store/base.html" %}
+{% load static %}
+
+{% block title %}Product Detail: {{ object.name }}{% endblock title %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <!-- Main Product Card (Col 1 of 2) -->
+        <div class="col-lg-8 mb-4">
+            <div class="card p-4">
+                
+                <!-- Product Header & Actions -->
+                <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
+                    <h2 class="h3 mb-0" style="color: var(--sidebar-bg);">{{ object.name }}</h2>
+                    <div class="d-flex gap-2">
+                        <a href="{% url 'product-update' object.slug %}" class="btn btn-outline-primary btn-sm">
+                            <i class="fa-solid fa-pen me-1"></i> Edit Product
+                        </a>
+                        <a href="{% url 'product-delete' object.slug %}" class="btn btn-outline-danger btn-sm">
+                            <i class="fa-solid fa-trash me-1"></i> Delete
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Product Details -->
+                <div class="row">
+                    <!-- Column 1: Core Info -->
+                    <div class="col-md-6">
+                        <h5 class="text-muted text-uppercase mb-3">Core Information</h5>
+                        <ul class="list-unstyled detail-list">
+                            <li class="mb-2">
+                                <span class="fw-bold">ID:</span> 
+                                <span class="text-secondary">{{ object.id }}</span>
+                            </li>
+                            <li class="mb-2">
+                                <span class="fw-bold">Category:</span> 
+                                <span class="badge text-bg-light border text-dark">{{ object.category.name }}</span>
+                            </li>
+                            <li class="mb-2">
+                                <span class="fw-bold">Vendor:</span> 
+                                <span class="text-secondary">{{ object.vendor.name|default:"N/A" }}</span>
+                            </li>
+                            <li class="mb-2">
+                                <span class="fw-bold">Expiration:</span> 
+                                {% if object.expiring_date %}
+                                    <span class="text-secondary">{{ object.expiring_date|date:"F j, Y" }}</span>
+                                    {% if object.expiring_date < "today"|date:"Y-m-d" %}
+                                        <span class="badge bg-danger ms-2">Expired</span>
+                                    {% endif %}
+                                {% else %}
+                                    <span class="text-muted">No Date Set</span>
+                                {% endif %}
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Column 2: Financial Info -->
+                    <div class="col-md-6">
+                        <h5 class="text-muted text-uppercase mb-3">Pricing</h5>
+                        <ul class="list-unstyled detail-list">
+                            <li class="mb-2">
+                                <span class="fw-bold">Unit Price:</span> 
+                                <span class="fs-5 text-success">${{ object.price|floatformat:2 }}</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Description -->
+                <div class="mt-4 pt-4 border-top">
+                    <h5 class="text-muted text-uppercase mb-3">Description</h5>
+                    <p class="text-secondary">{{ object.description }}</p>
+                </div>
+            </div>
+            
+            <!-- Additional Content Block (e.g., Usage History, Orders) -->
+            <div class="card p-4 mt-4">
+                <h5 class="text-muted text-uppercase mb-3">Related Transactions</h5>
+                <p class="text-secondary">Related sales orders, purchase orders, or inventory adjustments for this product will be displayed here.</p>
+            </div>
+            
+        </div>
+
+        <!-- Inventory Status Card (Col 2 of 2) -->
+        <div class="col-lg-4">
+            <div class="card p-4 sticky-top" style="top: 20px;">
+                <h4 class="mb-4" style="color: var(--primary-color);">Inventory Status</h4>
+                
+                <!-- Stock Level Calculation -->
+                {% with quantity=object.quantity %}
+                    
+                    {% if quantity > 50 %}
+                        {% with status_class='bg-success' status_text='High Stock' icon='fa-circle-check' %}
+                        {% endwith %}
+                    {% elif quantity > 10 %}
+                        {% with status_class='bg-warning' status_text='Medium Stock' icon='fa-exclamation-triangle' %}
+                        {% endwith %}
+                    {% else %}
+                        {% with status_class='bg-danger' status_text='Low Stock' icon='fa-exclamation-circle' %}
+                        {% endwith %}
+                    {% endif %}
+                    
+                    <!-- Display Stock Status -->
+                    <div class="d-flex align-items-center mb-4 p-3 rounded-3" style="background-color: #f8f9fa; border: 1px solid #e9ecef;">
+                        <span class="icon-shape me-3 {{ status_class }} text-white rounded-circle p-3">
+                            <i class="fa-solid {{ icon }} fa-lg"></i>
+                        </span>
+                        <div>
+                            <strong class="d-block text-muted">Current Status:</strong>
+                            <span class="fw-bold text-uppercase">{{ status_text }}</span>
+                        </div>
+                    </div>
+
+                    <!-- Quantity Information -->
+                    <div class="d-flex align-items-center mb-4 pt-3 border-top">
+                        <div class="me-4">
+                            <i class="fa-solid fa-box fa-xl me-2" style="color: var(--primary-color);"></i>
+                        </div>
+                        <div>
+                            <strong class="text-muted d-block">Quantity in Stock:</strong>
+                            <span class="fs-5 fw-bold">{{ quantity }} units</span>
+                        </div>
+                    </div>
+                
+                {% endwith %}
+                
+                <!-- FormMixin Example (Placeholder for adding a new feature if needed) -->
+                <!-- If FormMixin is still needed (e.g., for quick quantity adjust), you would render the form here: -->
+                {% if form %}
+                    <div class="pt-3 border-top">
+                        <h6 class="mb-3 text-muted">Quick Action (via FormMixin)</h6>
+                        <form method="post" action="{% url 'product-detail' object.slug %}">
+                            {% csrf_token %}
+                            <!-- Example: form.adjust_quantity_field -->
+                            <button type="submit" class="btn btn-sm btn-outline-secondary w-100">Update Inventory</button>
+                        </form>
+                    </div>
+                {% endif %}
+
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}

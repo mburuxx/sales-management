@@ -106,7 +106,7 @@ class ProductListView(LoginRequiredMixin, ExportMixin, tables.SingleTableView):
 
     model = Item
     table_class = ItemTable
-    template_name = "store/productslist.html"
+    template_name = "store/product_list.html"
     context_object_name = "items"
     paginate_by = 10
     SingleTableView.table_pagination = False
@@ -146,7 +146,8 @@ class ProductDetailView(LoginRequiredMixin, FormMixin, DetailView):
     """
 
     model = Item
-    template_name = "store/productdetail.html"
+    template_name = "store/product_detail.html"
+    form_class = ItemForm
 
     def get_success_url(self):
         return reverse("product-detail", kwargs={"slug": self.object.slug})
@@ -164,9 +165,9 @@ class ProductCreateView(LoginRequiredMixin, CreateView):
     """
 
     model = Item
-    template_name = "store/productcreate.html"
+    template_name = "store/product_create.html"
     form_class = ItemForm
-    success_url = "/products"
+    success_url = "/products/"
 
     def test_func(self):
         #item = Item.objects.get(id=pk)

@@ -105,7 +105,7 @@
                     <i class="fa fa-folder fa-fw me-2"></i> Products
                 </a>
                 <ul class="dropdown-menu">
-                    <li><a class="dropdown-item {% if request.resolver_match.url_name == 'productslist' %}active{% endif %}" href="#">All Products</a></li>
+                    <li><a class="dropdown-item {% if request.resolver_match.url_name == 'productslist' %}active{% endif %}" href="{% url 'product-list' %}">All Products</a></li>
                     <li><a class="dropdown-item {% if request.resolver_match.url_name == 'category-list' %}active{% endif %}" href="#">Categories</a></li>
                 </ul>
             </li>

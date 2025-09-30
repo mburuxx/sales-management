@@ -22,7 +22,7 @@ class ItemForm(forms.ModelForm):
             'description': forms.Textarea(
                 attrs={
                     'class': 'form-control',
-                    'rows': 2
+                    'rows': 4
                 }
             ),
             'category': forms.Select(attrs={'class': 'form-control'}),
@@ -33,10 +33,10 @@ class ItemForm(forms.ModelForm):
                     'step': '0.01'
                 }
             ),
-            'expiring_date': forms.DateTimeInput(
+            'expiring_date': forms.DateInput(
                 attrs={
                     'class': 'form-control',
-                    'type': 'datetime-local'
+                    'type': 'date'
                 }
             ),
             'vendor': forms.Select(attrs={'class': 'form-control'}),

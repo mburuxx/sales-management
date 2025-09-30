@@ -34,7 +34,7 @@ urlpatterns = [
     path(
         'products/',
         ProductListView.as_view(),
-        name='productslist'
+        name='product-list'
     ),
     path(
         'product/<slug:slug>/',
