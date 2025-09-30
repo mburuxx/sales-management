@@ -369,16 +369,24 @@ class CategoryDetailView(LoginRequiredMixin, DetailView):
     login_url = 'login'
 
     def get_context_data(self, **kwargs):
-        # 1. Get the base context from the parent class (which includes 'category')
+        """
+        Overrides context data to include a list of all products in this category 
+        and the count of unique vendors supplying them.
+        """
         context = super().get_context_data(**kwargs)
         
-        # 2. Use the object fetched by DetailView (self.object is the Category)
         current_category = self.object
         
-        # 3. Query all Item objects where the foreign key points to this category
-        context['items_in_category'] = Item.objects.filter(category=current_category)
+        # 1. Fetch all Item objects belonging to this category
+        items_in_category = Item.objects.filter(category=current_category)
+        context['items_in_category'] = items_in_category
         
-        # 4. Return the updated context
+        # 2. Efficiently count the number of unique vendors
+        # We query the Item model, filter by category, and count the distinct vendor_id values.
+        # .distinct() here operates on the QuerySet fields that are being aggregated/counted.
+        unique_vendor_count = items_in_category.values('vendor').distinct().count()
+        context['unique_vendor_count'] = unique_vendor_count
+
         return context
 
 
