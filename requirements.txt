@@ -10,3 +10,4 @@ django-tables2
 tablib
 django-filter
 django-crispy-forms
+crispy-bootstrap5 
