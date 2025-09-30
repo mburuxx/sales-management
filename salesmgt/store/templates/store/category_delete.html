@@ -1,0 +1,55 @@
+{% extends "store/base.html" %}
+{% load static %}
+
+{% block title %}Delete Category: {{ category.name }}{% endblock title %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-7">
+            <div class="card shadow-lg border-0 rounded-lg">
+                
+                <!-- Header (Danger Color) -->
+                <div class="card-header bg-danger text-white rounded-top-lg p-3">
+                    <h3 class="fw-bold mb-0"><i class="fa-solid fa-triangle-exclamation me-2"></i> Confirm Category Deletion</h3>
+                </div>
+                
+                <div class="card-body p-5">
+                    
+                    <h5 class="mb-4 text-dark">
+                        Are you certain you want to permanently delete the category: 
+                        <strong class="text-danger">{{ category.name }}</strong>?
+                    </h5>
+                    
+                    <div class="alert alert-warning shadow-sm" role="alert">
+                        <p class="mb-0 fw-semibold">
+                            <strong>Critical Warning:</strong> If this category is linked to any products, deleting the category may cause errors or require manual cleanup of those product records.
+                        </p>
+                    </div>
+
+                    <div class="p-3 my-4 border rounded" style="background-color: #fef2f2; border-left: 5px solid #ef4444 !important;">
+                        <p class="mb-1 text-muted small">Category ID</p>
+                        <h4 class="fw-bold text-danger">{{ category.pk }}</h4>
+                    </div>
+                    
+                    <!-- Deletion Form -->
+                    <form method="post" class="mt-4">
+                        {% csrf_token %}
+                        
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'category-detail' pk=category.pk %}" class="btn btn-outline-secondary rounded-pill">
+                                <i class="fa-solid fa-xmark me-1"></i> Cancel
+                            </a>
+                            
+                            <button type="submit" class="btn btn-danger rounded-pill shadow-sm">
+                                <i class="fa-solid fa-trash-can me-1"></i> Yes, Delete Category
+                            </button>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

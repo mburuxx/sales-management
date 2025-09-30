@@ -1,0 +1,111 @@
+{% extends "store/base.html" %}
+{% load static %}
+
+{% block title %}Category List{% endblock title %}
+
+{% block content %}
+<div class="container-fluid">
+
+    <!-- Header Card and Actions -->
+    <div class="my-4">
+        <div class="card p-4 shadow-sm border-0">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <h4 class="display-6 mb-0" style="color: var(--primary-color);">Product Categories</h4>
+                </div>
+                <div class="col-md-6 d-flex justify-content-end gap-2">
+                    <a class="btn btn-primary btn-sm rounded-pill shadow-sm" href="{% url 'category-create' %}">
+                        <i class="fa-solid fa-layer-group me-1"></i> Add Category
+                    </a>
+                    <!-- Placeholder for Export if needed later -->
+                    <!-- <a class="btn btn-outline-secondary btn-sm rounded-pill shadow-sm" href="#">
+                        <i class="fa-solid fa-download me-1"></i> Export
+                    </a> -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Category List Table -->
+    <div class="table-responsive">
+        <div class="card p-0 shadow-sm border-0">
+            <table class="table table-hover mb-0">
+                <thead class="thead-dark" style="background-color: var(--sidebar-header-bg); color: #fff;">
+                    <tr>
+                        <th scope="col" class="p-3">ID</th>
+                        <th scope="col" class="p-3">Name</th>
+                        <th scope="col" class="p-3 text-center">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for category in categories %}
+                    <tr style="cursor: pointer;">
+                        <th scope="row" class="align-middle">{{ category.pk }}</th>
+                        <td class="align-middle">
+                            <!-- Link to Detail View -->
+                            <a href="{% url 'category-detail' pk=category.pk %}" class="text-decoration-none fw-bold" style="color: var(--primary-color);">
+                                {{ category.name }}
+                            </a>
+                        </td>
+                        <td class="text-center align-middle">
+                            <a href="{% url 'category-update' pk=category.pk %}" class="btn btn-outline-secondary btn-sm me-2">
+                                <i class="fa-solid fa-pen"></i> Edit
+                            </a>
+                            <a href="{% url 'category-delete' pk=category.pk %}" class="btn btn-outline-danger btn-sm">
+                                <i class="fa-solid fa-trash"></i> Delete
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="3" class="text-center text-muted py-4">No categories have been added yet.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Pagination -->
+    {% if is_paginated %}
+    <nav aria-label="Category navigation" class="mt-4 pb-4">
+        <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+            {% else %}
+            <li class="page-item disabled">
+                <span class="page-link" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </span>
+            </li>
+            {% endif %}
+            
+            {% for i in paginator.page_range %}
+            <li class="page-item {% if page_obj.number == i %}active{% endif %}" aria-current="page">
+                <a class="page-link" href="?page={{ i }}">{{ i }}</a>
+            </li>
+            {% endfor %}
+            
+            {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+            {% else %}
+            <li class="page-item disabled">
+                <span class="page-link" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </span>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+
+</div>
+{% endblock content %}

@@ -234,14 +234,12 @@ class ProductDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     """
 
     model = Item
-    template_name = "store/productdelete.html"
+    template_name = "store/product_delete.html"
     success_url = "/products/"
 
     def test_func(self):
-        if self.request.user.is_superuser:
-            return True
-        else:
-            return False
+        return self.request.user.get_role() in [UserRole.ADMIN, UserRole.EXECUTIVE]
+
 
 
 class DeliveryListView(
@@ -370,6 +368,19 @@ class CategoryDetailView(LoginRequiredMixin, DetailView):
     context_object_name = 'category'
     login_url = 'login'
 
+    def get_context_data(self, **kwargs):
+        # 1. Get the base context from the parent class (which includes 'category')
+        context = super().get_context_data(**kwargs)
+        
+        # 2. Use the object fetched by DetailView (self.object is the Category)
+        current_category = self.object
+        
+        # 3. Query all Item objects where the foreign key points to this category
+        context['items_in_category'] = Item.objects.filter(category=current_category)
+        
+        # 4. Return the updated context
+        return context
+
 
 class CategoryCreateView(LoginRequiredMixin, CreateView):
     model = Category
@@ -393,7 +404,7 @@ class CategoryUpdateView(LoginRequiredMixin, UpdateView):
 
 class CategoryDeleteView(LoginRequiredMixin, DeleteView):
     model = Category
-    template_name = 'store/category_confirm_delete.html'
+    template_name = 'store/category_delete.html'
     context_object_name = 'category'
     success_url = reverse_lazy('category-list')
     login_url = 'login'
