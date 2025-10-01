@@ -15,12 +15,12 @@
     <style>
         :root {
             --sidebar-bg: #111827; /* Dark Blue/Black */
-            --sidebar-header-bg: #0d131f;
+            --sidebar-header-bg: #0d131f; /* Used for NEW Top Nav Background */
             --sidebar-link-color: #9ca3af;
             --sidebar-active-bg: #06b6d4; /* A cool, vibrant blue for active states */
             --content-bg: #f9fafb; /* Light Gray */
             --card-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
-            --primary-color: #0d6efd; /* Standard Bootstrap Blue */
+            --primary-color: #0d6efd; /* Standard Bootstrap Blue (Used for accents) */
         }
 
         body {
@@ -28,25 +28,51 @@
             font-family: 'Inter', sans-serif;
         }
         
-        /* Main content wrapper with margin for the sidebar */
-        #wrapper {
-            margin-left: 250px;
-            transition: margin-left 0.3s ease;
-        }
-
-        /* Top navigation bar */
+        /* #wrapper no longer needs margin-left, it will take full width */
+        /* We can remove the entire #wrapper block as it's just a full-width container now */
+        
+        /* Top navigation bar (OLD WHITE NAVBAR STYLES) - These are now overridden/unused by the dark navbar */
         .top-navbar {
             background-color: #fff;
             box-shadow: var(--card-shadow);
         }
-
-        .navbar-brand {
-            color: var(--sidebar-bg) !important;
-            font-weight: 200;
+        
+        /* NEW DARK NAVBAR STYLES (Copied from previous response and adjusted to use variables) */
+        .app-navbar {
+            background-color: var(--sidebar-header-bg); /* Use dark variable */
+            border-bottom: 1px solid #374151;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        
+        .app-navbar .navbar-brand {
+            color: #fff;
+            font-weight: 700;
+            font-size: 1.5rem;
+            margin-left: 20px;
+        }
+        
+        .app-navbar .nav-link {
+            color: var(--sidebar-link-color);
+            padding: 0.75rem 1rem;
+            font-weight: 500;
+            border-bottom: 3px solid transparent; 
+            transition: all 0.2s ease;
         }
 
-        .navbar-brand span {
-            color: var(--primary-color);
+        .app-navbar .nav-link:hover {
+            color: #fff;
+        }
+
+        .app-navbar .nav-link.active,
+        .app-navbar .nav-link.active:hover {
+            color: #fff;
+            background-color: transparent;
+            border-bottom: 3px solid var(--primary-color);
+        }
+        
+        /* Ensure mobile toggler icon is visible on dark background */
+        .app-navbar .navbar-toggler-icon {
+            filter: invert(1);
         }
 
         /* General Card Styling */
@@ -76,39 +102,114 @@
             border-color: var(--primary-color);
             box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
         }
-
-        /* Responsive adjustments */
-        @media (max-width: 768px) {
-            #wrapper {
-                margin-left: 0;
-            }
-        }
     </style>
     {% block stylesheets %}{% endblock stylesheets %}
 </head>
 <body>
     
-    {% include "store/sidebar.html" %}
+    <nav class="navbar navbar-expand-lg app-navbar sticky-top">
+        <div class="container-fluid">
+            
+            <a class="navbar-brand" href="{% url 'dashboard' %}">
+                <i class="fa-solid fa-store me-2" style="color: var(--primary-color);"></i> Logist<span style="color: var(--primary-color);">X</span>
+            </a>
 
-    <div id="wrapper">
-        <nav class="navbar navbar-expand-md top-navbar sticky-top">
-            <div class="container-fluid">
-                <a class="navbar-brand" href="#">Logist<span>X</span></a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#toggle-navbar" aria-controls="toggle-navbar" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="toggle-navbar">
-                    <ul class="navbar-nav ms-auto"></ul>
-                </div>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarNav">
+                
+                <ul class="navbar-nav mx-auto mb-2 mb-lg-0">
+                    
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" href="{% url 'dashboard' %}">
+                            <i class="fa fa-tachometer-alt fa-fw me-1"></i> Dashboard
+                        </a>
+                    </li>
+                    
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="accountsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fa fa-users fa-fw me-1"></i> Accounts
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="accountsDropdown">
+                            <li><a class="dropdown-item" href="{% url 'profile_list' %}">Staff</a></li>
+                            <li><a class="dropdown-item" href="{% url 'customer_list' %}">Customers</a></li>
+                            <li><a class="dropdown-item" href="{% url 'vendor-list' %}">Vendors</a></li>
+                        </ul>
+                    </li>
+                    
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fa fa-folder fa-fw me-1"></i> Products
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item {% if request.resolver_match.url_name == 'productslist' %}active{% endif %}" href="{% url 'product-list' %}">All Products</a></li>
+                            <li><a class="dropdown-item {% if request.resolver_match.url_name == 'category-list' %}active{% endif %}" href="{% url 'category-list' %}">Categories</a></li>
+                        </ul>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'saleslist' %}active{% endif %}" href="#">
+                            <i class="fa fa-shopping-bag fa-fw me-1"></i> Sales
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'purchaseslist' %}active{% endif %}" href="#">
+                            <i class="fa fa-shopping-cart fa-fw me-1"></i> Purchases
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'deliveries' %}active{% endif %}" href="{% url 'deliveries' %}">
+                            <i class="fa-solid fa-box fa-fw me-1"></i> Deliveries
+                        </a>
+                    </li>
+                    
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fa-solid fa-receipt fa-fw me-1"></i> Documents
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item {% if request.resolver_match.url_name == 'invoicelist' %}active{% endif %}" href="#">Invoices</a></li>
+                            <li><a class="dropdown-item {% if request.resolver_match.url_name == 'bill_list' %}active{% endif %}" href="#">Bills</a></li>
+                        </ul>
+                    </li>
+                </ul>
+                
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link d-flex align-items-center" href="#" id="profileDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <img class="rounded-circle" width="30" height="30" src="{{ request.user.profile.profile_picture.url }}" alt="Profile" />
+                            <span class="ms-2 d-lg-block d-none">{{ request.user.username }}</span>
+                            <span class="badge ms-2" style="background-color: var(--primary-color);">
+                                 {% if request.user.profile.role == 'AD' %} AD
+                                 {% elif request.user.profile.role == 'EX' %} EX
+                                 {% else %} OP
+                                 {% endif %}
+                            </span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
+                            <li><a class="dropdown-item" href="{% url 'user-profile' %}"><i class="fa-solid fa-user me-2"></i> View Profile</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                 <form method="post" action="{% url 'user-logout' %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="dropdown-item text-danger">
+                                        <i class="fa fa-sign-out-alt me-2"></i> Logout
+                                    </button>
+                                </form>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
             </div>
-        </nav>
-
-        <main class="p-4">
-            {% block content %}
-            {% endblock content %}
-        </main>
-    </div>
-
+        </div>
+    </nav>
+    
+    <main class="p-4">
+        {% block content %}
+        {% endblock content %}
+    </main>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     
