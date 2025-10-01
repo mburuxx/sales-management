@@ -299,21 +299,46 @@ class DeliveryDetailView(LoginRequiredMixin, DetailView):
     template_name = "store/delivery_detail.html"
 
 
+# store/views.py
+
+from django.views.generic.edit import CreateView
+from django.contrib.auth.mixins import LoginRequiredMixin
+from .models import Delivery
+from .forms import DeliveryForm
+from accounts.models import Customer
+# Assuming DeliveryCreateView is defined here
+
 class DeliveryCreateView(LoginRequiredMixin, CreateView):
-    """
-    View class to create a new delivery.
-
-    Attributes:
-    - model: The model associated with the view.
-    - fields: The fields to be included in the form.
-    - template_name: The HTML template used for rendering the view.
-    - success_url: The URL to redirect to upon successful form submission.
-    """
-
     model = Delivery
     form_class = DeliveryForm
     template_name = "store/delivery_form.html"
     success_url = "/deliveries/"
+
+    def form_valid(self, form):
+        # 1. Check if an existing customer was selected
+        customer = form.cleaned_data.get('existing_customer')
+        
+        if customer:
+            # Case A: Existing customer selected. Set the FK field.
+            form.instance.customer = customer
+        
+        else:
+            # Case B: New customer details provided. Must create customer first.
+            
+            # Use form data to create a new Customer object
+            new_customer = Customer.objects.create(
+                first_name=form.cleaned_data['new_customer_first_name'],
+                # We save new customer location in the Customer's 'address' field
+                address=form.cleaned_data['new_customer_location'],
+                phone=form.cleaned_data['new_customer_phone'],
+                # You can add logic for last_name/email if you add those to the form
+            )
+            
+            # Set the new Customer object as the Foreign Key for the Delivery
+            form.instance.customer = new_customer
+            
+        # 2. Save the Delivery object
+        return super().form_valid(form)
 
 
 class DeliveryUpdateView(LoginRequiredMixin, UpdateView):

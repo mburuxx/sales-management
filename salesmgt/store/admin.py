@@ -38,11 +38,8 @@ class DeliveryAdmin(admin.ModelAdmin):
     """
     Admin configuration for the Delivery model.
     """
-    list_display = (
-        'item', 'customer_name', 'phone_number',
-        'location', 'date', 'is_delivered'
-    )
-    search_fields = ('item__name', 'customer_name')
+    list_display = ('item', 'customer', 'date', 'is_delivered')
+    search_fields = ('item__name', 'customer__name')
     list_filter = ('is_delivered', 'date')
     ordering = ('-date',)
 

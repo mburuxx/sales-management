@@ -148,9 +148,18 @@
                                 {{ delivery.item.name }}
                             </a>
                         </td>
-                        <td>{{ delivery.customer_name }}</td>
-                        <td>{{ delivery.phone_number }}</td>
-                        <td>{{ delivery.location }}</td>
+                        {# *** FIX START: Use the Foreign Key relationship to access customer data *** #}
+                        <td>
+                            {{ delivery.customer.get_full_name|default:"N/A" }}
+                        </td>
+                        <td>
+                            {{ delivery.customer.phone|default:"N/A" }}
+                        </td>
+                        <td>
+                            {{ delivery.customer.address|default:"N/A" }}
+                        </td>
+                        {# *** FIX END *** #}
+                        
                         <td>{{ delivery.date|date:"M d, Y H:i" }}</td> 
                         <td style="text-align: center;">
                             {% if delivery.is_delivered %}

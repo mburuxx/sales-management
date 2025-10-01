@@ -87,41 +87,82 @@ class CategoryForm(forms.ModelForm):
         }
 
 
+# store/forms.py
+
+from django import forms
+from .models import Delivery
+from accounts.models import Customer
+from phonenumber_field.formfields import PhoneNumberField
+
 class DeliveryForm(forms.ModelForm):
+    # 1. NEW FIELD: ModelChoiceField for existing customers
+    # We set required=False here because the customer might be created via the other fields.
+    existing_customer = forms.ModelChoiceField(
+        queryset=Customer.objects.all().order_by('first_name'),
+        required=False,
+        empty_label="--- Select Existing Customer ---",
+        label="Select Existing Customer",
+        widget=forms.Select(attrs={'class': 'form-control select2-enabled'})
+    )
+
+    # 2. FIELDS for creating a NEW customer (Optional)
+    new_customer_first_name = forms.CharField(
+        max_length=256, required=False, label="New Customer First Name",
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Only fill if new customer'})
+    )
+    new_customer_phone = PhoneNumberField(
+        required=False, label="New Customer Phone",
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Phone for new customer'})
+    )
+    new_customer_location = forms.CharField(
+        max_length=256, required=False, label="New Customer Address/Location",
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Address for new customer'})
+    )
+
     class Meta:
         model = Delivery
-        fields = [
-            'item',
-            'customer_name',
-            'phone_number',
-            'location',
-            'date',
-            'is_delivered'
-        ]
+        # The 'customer' field is the Foreign Key we want to ultimately save to
+        fields = ['item', 'date', 'is_delivered'] 
         widgets = {
-            'item': forms.Select(attrs={
-                'class': 'form-control',
-                'placeholder': 'Select item',
-            }),
-            'customer_name': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'Enter customer name',
-            }),
-            'phone_number': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'Enter phone number',
-            }),
-            'location': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'Enter delivery location',
-            }),
-            'date': forms.DateTimeInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'Select delivery date and time',
-                'type': 'datetime-local'
-            }),
-            'is_delivered': forms.CheckboxInput(attrs={
-                'class': 'form-check-input',
-                'label': 'Mark as delivered',
-            }),
+            'item': forms.Select(attrs={'class': 'form-control'}),
+            'date': forms.DateTimeInput(attrs={'class': 'form-control', 'type': 'datetime-local'}),
+            'is_delivered': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
+        
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Apply form-control class to all auto-generated fields
+        for field in self.fields:
+            if field not in ['is_delivered', 'existing_customer', 'new_customer_phone']:
+                self.fields[field].widget.attrs.update({'class': 'form-control'})
+
+    def clean(self):
+        cleaned_data = super().clean()
+        
+        existing_customer = cleaned_data.get('existing_customer')
+        new_first_name = cleaned_data.get('new_customer_first_name')
+        new_phone = cleaned_data.get('new_customer_phone')
+
+        is_new_customer = bool(new_first_name or new_phone)
+
+        # 3. Validation Logic
+        if existing_customer and is_new_customer:
+            # Error: Cannot select an existing customer AND fill out new customer details
+            raise forms.ValidationError(
+                "Please either select an existing customer OR fill out the new customer details, not both."
+            )
+        
+        if not existing_customer and not is_new_customer:
+            # Error: Must provide customer information
+            raise forms.ValidationError(
+                "You must either select an existing customer or provide details for a new one."
+            )
+
+        if is_new_customer:
+            # If creating a new customer, ensure required fields are present
+            if not new_first_name:
+                 self.add_error('new_customer_first_name', "First Name is required for a new customer.")
+            if not new_phone:
+                 self.add_error('new_customer_phone', "Phone Number is required for a new customer.")
+            
+        return cleaned_data

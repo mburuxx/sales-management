@@ -16,7 +16,7 @@ from django.urls import reverse
 from django.forms import model_to_dict
 from django_extensions.db.fields import AutoSlugField
 from phonenumber_field.modelfields import PhoneNumberField
-from accounts.models import Vendor
+from accounts.models import Vendor, Customer
 
 
 class Category(models.Model):
@@ -83,17 +83,18 @@ class Delivery(models.Model):
     Represents a delivery of an item to a customer.
     """
     item = models.ForeignKey(Item, blank=True, null=True, on_delete=models.SET_NULL)
-    customer_name = models.CharField(max_length=30, blank=True, null=True)
-    phone_number = PhoneNumberField(blank=True, null=True)
-    location = models.CharField(max_length=20, blank=True, null=True)
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE, null=True, blank=True, related_name='deliveries', verbose_name='Customer')
     date = models.DateTimeField()
     is_delivered = models.BooleanField(default=False, verbose_name='Is Delivered')
 
     def __str__(self):
-        """
-        String representation of the delivery.
-        """
-        return (
-            f"Delivery of {self.item} to {self.customer_name} "
-            f"at {self.location} on {self.date}"
-        )
+            """
+            String representation of the delivery.
+            """
+            customer_name = self.customer.get_full_name() if self.customer else "Unknown Customer"
+            customer_address = self.customer.address if self.customer and self.customer.address else "Unknown Location"
+            
+            return (
+                f"Delivery of {self.item} to {customer_name} "
+                f"at {customer_address} on {self.date.strftime('%Y-%m-%d')}"
+            )
