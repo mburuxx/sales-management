@@ -296,7 +296,7 @@ class DeliveryDetailView(LoginRequiredMixin, DetailView):
     """
 
     model = Delivery
-    template_name = "store/deliverydetail.html"
+    template_name = "store/delivery_detail.html"
 
 
 class DeliveryCreateView(LoginRequiredMixin, CreateView):
@@ -313,7 +313,7 @@ class DeliveryCreateView(LoginRequiredMixin, CreateView):
     model = Delivery
     form_class = DeliveryForm
     template_name = "store/delivery_form.html"
-    success_url = "/deliveries"
+    success_url = "/deliveries/"
 
 
 class DeliveryUpdateView(LoginRequiredMixin, UpdateView):
@@ -330,7 +330,7 @@ class DeliveryUpdateView(LoginRequiredMixin, UpdateView):
     model = Delivery
     form_class = DeliveryForm
     template_name = "store/delivery_form.html"
-    success_url = "/deliveries"
+    success_url = "/deliveries/"
 
 
 class DeliveryDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
@@ -344,8 +344,8 @@ class DeliveryDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     """
 
     model = Delivery
-    template_name = "store/productdelete.html"
-    success_url = "/deliveries"
+    template_name = "store/delivery_delete.html"
+    success_url = "/deliveries/"
 
     def test_func(self):
         if self.request.user.is_superuser:

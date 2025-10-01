@@ -16,9 +16,19 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('accounts.urls')),
     path('', include('store.urls')),
 ]
+
+if settings.DEBUG:
+    # It is good practice to add static files too, even if you are only 
+    # seeing issues with the media handler.
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    
+    # This is the line that was causing the conflict:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
