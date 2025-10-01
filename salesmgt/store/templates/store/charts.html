@@ -1,0 +1,164 @@
+{% extends "store/base.html" %}
+{% load static %}
+
+{% block title %}Dashboard Charts{% endblock title %}
+
+{% block content %}
+<div class="container-fluid py-5">
+    
+    <h4 class="display-6 mb-4" style="color: #0d6efd;">
+        <i class="fa-solid fa-chart-line me-2"></i> Store Analytics Dashboard
+    </h4>
+
+    <div class="row">
+        
+        <div class="col-md-6 col-lg-6 mb-4">
+            <div class="card shadow border-0">
+                <div class="card-body">
+                    <h5 class="card-title fw-bold text-center mb-4">Category Distribution (Item Counts)</h5>
+                    <div class="chart-container">
+                        <canvas id="pieChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6 col-lg-6 mb-4">
+            <div class="card shadow border-0">
+                <div class="card-body">
+                    <h5 class="card-title fw-bold text-center mb-4">Sales Over Time (Revenue)</h5>
+                    <div class="chart-container">
+                        <canvas id="lineChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Custom color palette for consistency, starting with the primary blue
+        const primaryColors = [
+            'rgba(13, 110, 253, 0.8)', // Primary Blue
+            'rgba(255, 193, 7, 0.8)',  // Warning Yellow
+            'rgba(40, 167, 69, 0.8)',  // Success Green
+            'rgba(220, 53, 69, 0.8)',  // Danger Red
+            'rgba(108, 117, 125, 0.8)',// Secondary Gray
+        ];
+        
+        // --- Pie Chart (Category Distribution) ---
+        var ctxPie = document.getElementById('pieChart').getContext('2d');
+        var pieChart = new Chart(ctxPie, {
+            type: 'doughnut',
+            data: {
+                // IMPORTANT: Use JSON.parse() when passing lists/JSON data with safe filter
+                labels: JSON.parse('{{ categories|safe }}'),
+                datasets: [{
+                    data: JSON.parse('{{ category_counts|safe }}'),
+                    backgroundColor: primaryColors,
+                    borderColor: 'rgba(255, 255, 255, 1)',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            usePointStyle: true,
+                            padding: 15,
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(tooltipItem) {
+                                // Display percentage along with raw count
+                                const data = tooltipItem.dataset.data;
+                                const total = data.reduce((a, b) => a + b, 0);
+                                const value = tooltipItem.raw;
+                                const percentage = ((value / total) * 100).toFixed(1) + '%';
+                                return `${tooltipItem.label}: ${value} items (${percentage})`;
+                            }
+                        }
+                    },
+                    title: {
+                        display: false,
+                    }
+                },
+                cutout: '70%',
+                maintainAspectRatio: false
+            }
+        });
+
+        // --- Line Chart (Sales Over Time) ---
+        var ctxLine = document.getElementById('lineChart').getContext('2d');
+        var lineChart = new Chart(ctxLine, {
+            type: 'line',
+            data: {
+                labels: JSON.parse('{{ sale_dates_labels|safe }}'),
+                datasets: [{
+                    label: 'Total Revenue',
+                    data: JSON.parse('{{ sale_dates_values|safe }}'),
+                    fill: true,
+                    backgroundColor: 'rgba(13, 110, 253, 0.1)', // Light blue fill
+                    borderColor: 'rgba(13, 110, 253, 1)', // Primary blue line
+                    tension: 0.3,
+                    pointBackgroundColor: 'rgba(13, 110, 253, 1)'
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    title: {
+                        display: false,
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Total Revenue ($)',
+                            font: { weight: 'bold' }
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Date',
+                            font: { weight: 'bold' }
+                        }
+                    }
+                },
+                maintainAspectRatio: false
+            }
+        });
+    </script>
+
+    <style>
+        .chart-container {
+            position: relative;
+            width: 100%;
+            height: 40vh; /* Use viewport height for better responsiveness */
+            min-height: 300px; 
+        }
+
+        /* Chart elements respect container size */
+        #pieChart, #lineChart {
+            max-width: 100%;
+            height: 100%;
+        }
+
+        .card {
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.05) !important;
+            border-radius: 0.5rem;
+        }
+    </style>
+
+</div>
+{% endblock content %}
