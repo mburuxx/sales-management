@@ -8,23 +8,49 @@
 
     <div class="row">
         
+        {# CHART 1: Top 5 Selling Items (Bar Chart) #}
         <div class="col-md-6 col-lg-6 mb-4">
             <div class="card shadow border-0">
                 <div class="card-body">
-                    <h5 class="card-title fw-bold text-center mb-4">Category Distribution (Item Counts)</h5>
+                    <h5 class="card-title fw-bold text-center mb-4">Top 5 Selling Items (by Quantity)</h5>
                     <div class="chart-container">
-                        <canvas id="pieChart"></canvas>
+                        <canvas id="barChartTopItems"></canvas>
                     </div>
                 </div>
             </div>
         </div>
         
+        {# CHART 2: Delivery Status (Polar Area Chart) #}
         <div class="col-md-6 col-lg-6 mb-4">
             <div class="card shadow border-0">
                 <div class="card-body">
-                    <h5 class="card-title fw-bold text-center mb-4">Sales Over Time (Revenue)</h5>
+                    <h5 class="card-title fw-bold text-center mb-4">Purchase Delivery Status</h5>
                     <div class="chart-container">
-                        <canvas id="lineChart"></canvas>
+                        <canvas id="polarAreaChartDelivery"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        {# CHART 3: Top 5 Spending Vendors (Horizontal Bar Chart) #}
+        <div class="col-md-6 col-lg-6 mb-4">
+            <div class="card shadow border-0">
+                <div class="card-body">
+                    <h5 class="card-title fw-bold text-center mb-4">Top 5 Spending Vendors (Total Purchase Value)</h5>
+                    <div class="chart-container">
+                        <canvas id="horizontalBarChartVendors"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {# CHART 4: Inventory Health (Radar Chart) #}
+        <div class="col-md-6 col-lg-6 mb-4">
+            <div class="card shadow border-0">
+                <div class="card-body">
+                    <h5 class="card-title fw-bold text-center mb-4">Category Inventory Health (Stock vs. Value)</h5>
+                    <div class="chart-container">
+                        <canvas id="radarChartInventory"></canvas>
                     </div>
                 </div>
             </div>
@@ -43,103 +69,147 @@
         const primaryColor = getCssVariable('--primary-color'); 
         const activeColor = getCssVariable('--sidebar-active-bg');
         
-        // 2. DEFINE DYNAMIC COLOR PALETTE
-        const dynamicColors = [
-            primaryColor,
-            activeColor,
-            '#ffc107', // Warning Yellow
-            '#198754', // Success Green
-            '#dc3545', // Danger Red
-        ];
-        
-        // --- Pie Chart (Category Distribution) ---
-        var ctxPie = document.getElementById('pieChart').getContext('2d');
-        var pieChart = new Chart(ctxPie, {
-            type: 'doughnut',
-            data: {
-                labels: JSON.parse('{{ categories|safe }}'),
-                datasets: [{
-                    data: JSON.parse('{{ category_counts|safe }}'),
-                    // Apply colors with 0.7 opacity
-                    backgroundColor: dynamicColors.map(color => color + 'b3'),
-                    borderColor: 'rgba(255, 255, 255, 1)',
-                    borderWidth: 2
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        position: 'bottom',
-                        labels: {
-                            usePointStyle: true,
-                            padding: 15,
-                        }
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function(tooltipItem) {
-                                const data = tooltipItem.dataset.data;
-                                const total = data.reduce((a, b) => a + b, 0);
-                                const value = tooltipItem.raw;
-                                const percentage = ((value / total) * 100).toFixed(1) + '%';
-                                return `${tooltipItem.label}: ${value} items (${percentage})`;
-                            }
-                        }
-                    },
-                    title: {
-                        display: false,
-                    }
-                },
-                cutout: '70%',
-                maintainAspectRatio: false
-            }
-        });
+        const COLOR_VIOLET = '#6D28D9';
+        const COLOR_CYAN = '#06B6D4';
+        const COLOR_PINK = '#DB2777';
+        const COLOR_GOLD = '#FBBF24';
+        const COLOR_LIME = '#84CC16';
+        const COLOR_INDIGO = '#4F46E5';
+        const COLOR_EMERALD = '#10B981'; // Retained as a vibrant hue, not 'Success'
+        const COLOR_ORANGE = '#F97316'; // Retained as a vibrant hue, not 'Danger'
 
-        // --- Line Chart (Sales Over Time) ---
-        var ctxLine = document.getElementById('lineChart').getContext('2d');
-        var lineChart = new Chart(ctxLine, {
-            type: 'line',
+        const dynamicColors = [
+            COLOR_VIOLET,
+            COLOR_CYAN,
+            COLOR_PINK,
+            COLOR_GOLD,
+            COLOR_LIME,
+            COLOR_INDIGO,
+            COLOR_EMERALD,
+            COLOR_ORANGE,
+        ];
+
+        // --- CHART 1: Top 5 Selling Items (Bar Chart) ---
+        var ctxBar = document.getElementById('barChartTopItems').getContext('2d');
+        new Chart(ctxBar, {
+            type: 'bar',
             data: {
-                labels: JSON.parse('{{ sale_dates_labels|safe }}'),
+                labels: JSON.parse('{{ top_items_labels|safe }}'),
                 datasets: [{
-                    label: 'Total Revenue',
-                    data: JSON.parse('{{ sale_dates_values|safe }}'),
-                    fill: true,
-                    backgroundColor: primaryColor + '1a', 
-                    borderColor: primaryColor,
-                    tension: 0.3,
-                    pointBackgroundColor: primaryColor
+                    label: 'Quantity Sold',
+                    data: JSON.parse('{{ top_items_quantities|safe }}'),
+                    backgroundColor: dynamicColors[5], // Success Green
+                    borderColor: dynamicColors[5],
+                    borderWidth: 1
                 }]
             },
             options: {
                 responsive: true,
-                plugins: {
-                    legend: {
-                        position: 'top',
-                    },
-                    title: {
-                        display: false,
-                    }
-                },
+                maintainAspectRatio: false,
                 scales: {
                     y: {
                         beginAtZero: true,
-                        title: {
-                            display: true,
-                            text: 'Total Revenue ($)',
-                            font: { weight: 'bold' }
-                        }
-                    },
-                    x: {
-                        title: {
-                            display: true,
-                            text: 'Date',
-                            font: { weight: 'bold' }
-                        }
+                        title: { display: true, text: 'Units Sold' }
                     }
+                }
+            }
+        });
+
+        // --- CHART 2: Delivery Status (Polar Area Chart) ---
+        var ctxPolar = document.getElementById('polarAreaChartDelivery').getContext('2d');
+        new Chart(ctxPolar, {
+            type: 'polarArea',
+            data: {
+                labels: JSON.parse('{{ delivery_status_labels|safe }}'),
+                datasets: [{
+                    data: JSON.parse('{{ delivery_status_counts|safe }}'),
+                    backgroundColor: [dynamicColors[2], dynamicColors[4]], // Green (Success), Red (Pending)
+                    borderColor: 'rgba(255, 255, 255, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'right' },
+                    title: { display: false }
+                }
+            }
+        });
+        
+        // --- CHART 3: Top 5 Spending Vendors (Horizontal Bar Chart) ---
+        var ctxHBar = document.getElementById('horizontalBarChartVendors').getContext('2d');
+        new Chart(ctxHBar, {
+            type: 'bar',
+            data: {
+                labels: JSON.parse('{{ top_vendors_labels|safe }}'),
+                datasets: [{
+                    label: 'Total Value Spent ($)',
+                    data: JSON.parse('{{ top_vendors_values|safe }}'),
+                    backgroundColor: dynamicColors[7], // Danger Red
+                    borderColor: dynamicColors[7],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                indexAxis: 'y', // Makes it a horizontal bar chart
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: {
+                        beginAtZero: true,
+                        title: { display: true, text: 'Total Purchase Value ($)' }
+                    }
+                }
+            }
+        });
+
+        // --- CHART 4: Inventory Health (Radar Chart) ---
+        var ctxRadar = document.getElementById('radarChartInventory').getContext('2d');
+        new Chart(ctxRadar, {
+            type: 'radar',
+            data: {
+                labels: JSON.parse('{{ inventory_health_labels|safe }}'), // Categories
+                datasets: [
+                    {
+                        label: 'Relative Quantity Count',
+                        data: JSON.parse('{{ inventory_health_quantities|safe }}'),
+                        fill: true,
+                        backgroundColor: primaryColor + '40', // Light primary fill
+                        borderColor: primaryColor,
+                        pointBackgroundColor: primaryColor,
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: primaryColor
+                    },
+                    {
+                        label: 'Relative Total Value',
+                        data: JSON.parse('{{ inventory_health_values|safe }}'),
+                        fill: true,
+                        backgroundColor: dynamicColors[1] + '40', // Light secondary fill
+                        borderColor: dynamicColors[1],
+                        pointBackgroundColor: dynamicColors[1],
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: dynamicColors[1]
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                elements: {
+                    line: { borderWidth: 2 }
                 },
-                maintainAspectRatio: false
+                scales: {
+                    r: {
+                        angleLines: { display: false },
+                        suggestedMin: 0,
+                        suggestedMax: 100, // Normalized to 100 for comparison
+                        pointLabels: { font: { size: 12 } }
+                    }
+                }
             }
         });
     </script>
@@ -152,7 +222,7 @@
             min-height: 300px; 
         }
 
-        #pieChart, #lineChart {
+        #barChartTopItems, #polarAreaChartDelivery, #horizontalBarChartVendors, #radarChartInventory {
             max-width: 100%;
             height: 100%;
         }

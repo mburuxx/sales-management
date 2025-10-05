@@ -39,7 +39,7 @@ from django_tables2.export.views import ExportMixin
 
 # Local app imports
 from accounts.models import Profile, Vendor
-from sales.models import Sale
+from sales.models import Sale, SaleDetail, Purchase, DELIVERY_CHOICES
 from .models import Category, Item, Delivery
 from .forms import ItemForm, CategoryForm, DeliveryForm
 from .tables import ItemTable
@@ -49,53 +49,94 @@ from accounts.models import UserRole
 
 import json # <-- ADD THIS IMPORT
 
+# Helper function for normalization (for Radar Chart)
+def normalize_data(data):
+    """Normalizes a list of values to a 0-100 scale."""
+    if not data:
+        return []
+    # Convert data to floats and handle None
+    data = [float(d) if d is not None else 0.0 for d in data] 
+    
+    max_val = max(data)
+    if max_val == 0:
+        return [0] * len(data)
+    # Normalize: (value / max_value) * 100
+    return [round((x / max_val) * 100) for x in data]
+
 
 @login_required
 def dashboard(request):
     profiles = Profile.objects.all()
-    # Note: Category.objects.annotate(nitem=Count("item")) is redundant here.
     items = Item.objects.all()
     
-    # 1. Dashboard Cards Data
+    # 1. Dashboard Cards Data (Kept from previous iteration)
     total_items = (
         Item.objects.all()
         .aggregate(Sum("quantity"))
-        .get("quantity__sum", 0) # Use 0 instead of 0.00 for cleaner aggregate
+        .get("quantity__sum", 0) 
     )
     items_count = items.count()
     profiles_count = profiles.count()
-
-    # 2. Chart Data: Category Distribution
-    category_data = Category.objects.annotate(
-        item_count=Count("item")
-    ).values("name", "item_count")
     
-    categories = [cat["name"] for cat in category_data]
-    category_counts = [cat["item_count"] for cat in category_data]
+    # ------------------------------------------------------------------
+    # 2. CHART 1: Top 5 Selling Items (Bar Chart)
+    # ------------------------------------------------------------------
+    top_items_data = SaleDetail.objects.values('item__name').annotate(
+        total_qty_sold=Sum('quantity')
+    ).order_by('-total_qty_sold')[:5]
 
-    # 3. Chart Data: Sales Over Time
-    sale_dates = (
-        Sale.objects.values("date_added__date")
-        .annotate(total_sales=Sum("grand_total"))
-        .order_by("date_added__date")
-    )
+    top_items_labels = [item['item__name'] for item in top_items_data]
+    top_items_quantities = [item['total_qty_sold'] for item in top_items_data]
+
+    # ------------------------------------------------------------------
+    # 3. CHART 2: Delivery Status Distribution (Polar Area Chart)
+    # ------------------------------------------------------------------
+    delivery_status_data = Purchase.objects.values('delivery_status').annotate(
+        count=Count('delivery_status')
+    ).order_by('delivery_status')
+
+    # FIX: Access choices via the field itself, not the global variable
+    # This is the correct, robust way to get the choices tuple.
+    status_map = dict(Purchase._meta.get_field('delivery_status').choices)
+
+    # Map status codes to display names
+    delivery_status_labels = [status_map.get(d['delivery_status'], d['delivery_status']) for d in delivery_status_data]
+    delivery_status_counts = [d['count'] for d in delivery_status_data]
+
+    # ------------------------------------------------------------------
+    # 4. CHART 3: Top 5 Spending Vendors (Horizontal Bar Chart)
+    # ------------------------------------------------------------------
+    top_vendors_data = Purchase.objects.values('vendor__name').annotate(
+        total_spent=Sum('total_value')
+    ).order_by('-total_spent')[:5]
+
+    top_vendors_labels = [v['vendor__name'] for v in top_vendors_data]
+    # Ensure conversion to float for JSON/Chart.js
+    top_vendors_values = [float(v['total_spent']) for v in top_vendors_data] 
+
+    # ------------------------------------------------------------------
+    # 5. CHART 4: Inventory Health by Category (Radar Chart)
+    # ------------------------------------------------------------------
+    inventory_health_data = Category.objects.annotate(
+        total_quantity=Sum('item__quantity'),
+        total_value=Sum('item__quantity') * Sum('item__price') # A simplified proxy for inventory value
+    ).values('name', 'total_quantity', 'total_value')
+
+    inventory_health_labels = [i['name'] for i in inventory_health_data]
     
-    sale_dates_labels = [
-        date["date_added__date"].strftime("%Y-%m-%d") for date in sale_dates
-    ]
-    # Ensure total_sales is converted to float for JSON compatibility
-    sale_dates_values = [float(date["total_sales"]) for date in sale_dates] 
+    raw_quantities = [i['total_quantity'] or 0 for i in inventory_health_data]
+    raw_values = [i['total_value'] or 0 for i in inventory_health_data]
 
+    # Normalize data to 0-100 scale for comparison on the Radar Chart
+    inventory_health_quantities = normalize_data(raw_quantities)
+    inventory_health_values = normalize_data(raw_values)
     
-    # 4. JSON Serialization for Charts
-    # These must be JSON strings for the template's JSON.parse() to work
-    categories_json = json.dumps(categories)
-    category_counts_json = json.dumps(category_counts)
-    sale_dates_labels_json = json.dumps(sale_dates_labels)
-    sale_dates_values_json = json.dumps(sale_dates_values)
-
-
+    # ------------------------------------------------------------------
+    # 6. JSON Serialization
+    # ------------------------------------------------------------------
+    
     context = {
+        # Card data
         "items": items,
         "profiles": profiles,
         "profiles_count": profiles_count,
@@ -105,11 +146,26 @@ def dashboard(request):
         "delivery": Delivery.objects.all(),
         "sales": Sale.objects.all(),
         
-        # Pass JSON strings for the charts
-        "categories": categories_json,
-        "category_counts": category_counts_json,
-        "sale_dates_labels": sale_dates_labels_json,
-        "sale_dates_values": sale_dates_values_json,
+        # Chart 1: Top Items
+        "top_items_labels": json.dumps(top_items_labels),
+        "top_items_quantities": json.dumps(top_items_quantities),
+        
+        # Chart 2: Delivery Status
+        "delivery_status_labels": json.dumps(delivery_status_labels),
+        "delivery_status_counts": json.dumps(delivery_status_counts),
+        
+        # Chart 3: Top Vendors
+        "top_vendors_labels": json.dumps(top_vendors_labels),
+        "top_vendors_values": json.dumps(top_vendors_values),
+        
+        # Chart 4: Inventory Health
+        "inventory_health_labels": json.dumps(inventory_health_labels),
+        "inventory_health_quantities": json.dumps(inventory_health_quantities),
+        "inventory_health_values": json.dumps(inventory_health_values),
+        
+        # Retained but unused old chart variables (just in case)
+        # "categories": json.dumps([]),
+        # "category_counts": json.dumps([]),
     }
     
     return render(request, "store/dashboard.html", context)
