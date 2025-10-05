@@ -1,0 +1,163 @@
+{% extends "store/base.html" %}
+{% load static %}
+
+{% block title %}Purchase Detail: #{{ object.id }}{% endblock title %}
+
+{% block stylesheets %}
+<style>
+    /* Styling for the detail lists (consistent with sales detail) */
+    .detail-list {
+        padding-left: 0;
+        list-style: none;
+    }
+
+    .detail-list li {
+        padding: 0.5rem 0;
+        border-bottom: 1px dashed #eee;
+    }
+
+    .detail-list li:last-child {
+        border-bottom: none;
+    }
+
+    .detail-list .fw-bold {
+        min-width: 150px; /* Aligns labels nicely */
+        display: inline-block;
+        color: var(--sidebar-bg); /* Use dark text for labels */
+    }
+    
+    /* Status badge colors (keeping these for data distinction) */
+    .bg-soft-danger {
+        background-color: #f8d7da;
+    }
+    .bg-soft-success {
+        background-color: #d1e7dd;
+    }
+    
+</style>
+{% endblock stylesheets %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-lg-8 mb-4">
+            {# ADDED shadow-lg and border-0 for consistency #}
+            <div class="card p-4 shadow-lg border-0 rounded-lg">
+                
+                <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
+                    {# CORRECTED: Using var(--primary-color) for the title color #}
+                    <h2 class="h3 mb-0" style="color: var(--primary-color);">Purchase Order #{{ object.id }}</h2>
+                    <div class="d-flex gap-2">
+                        {# Buttons use primary/info/danger/secondary as appropriate for the action #}
+                        <a href="{% url 'purchase-update' object.id %}" class="btn btn-outline-info btn-sm">
+                            <i class="fa-solid fa-pen me-1"></i> Edit Purchase
+                        </a>
+                        {# Show Delete button only to superusers, matching your View's logic #}
+                        {% if request.user.is_superuser %}
+                        <a href="{% url 'purchase-delete' object.id %}" class="btn btn-outline-danger btn-sm">
+                            <i class="fa-solid fa-trash-can me-1"></i> Delete
+                        </a>
+                        {% endif %}
+                        <a href="{% url 'purchases-list' %}" class="btn btn-outline-secondary btn-sm">
+                            <i class="fa-solid fa-arrow-left me-1"></i> Back to List
+                        </a>
+                    </div>
+                </div>
+
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <h5 class="text-muted text-uppercase mb-3">Order Information</h5>
+                        <ul class="list-unstyled detail-list">
+                            <li class="mb-2">
+                                <span class="fw-bold">Product:</span> 
+                                {# CORRECTED: Changed text-success to text-primary for consistency #}
+                                <a href="{% url 'product-detail' object.item.slug %}" class="text-primary fw-bold" style="text-decoration: none;">
+                                    {{ object.item.name }}
+                                </a>
+                            </li>
+                            <li class="mb-2">
+                                <span class="fw-bold">Vendor:</span> 
+                                <span class="text-secondary">{{ object.vendor.name }}</span>
+                            </li>
+                            <li class="mb-2">
+                                <span class="fw-bold">Order Date:</span> 
+                                <span class="text-secondary">{{ object.order_date|date:"F j, Y h:i A" }}</span>
+                            </li>
+                            <li class="mb-2">
+                                <span class="fw-bold">Delivery Status:</span> 
+                                {% if object.delivery_status == 'P' %}
+                                    <span class="badge bg-soft-danger text-danger p-2">
+                                        <i class="fa-solid fa-clock me-1"></i> Pending
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-soft-success text-success p-2">
+                                        <i class="fa-solid fa-check-circle me-1"></i> {{ object.get_delivery_status_display }}
+                                    </span>
+                                {% endif %}
+                            </li>
+                            <li class="mb-2">
+                                <span class="fw-bold">Delivery Date:</span> 
+                                <span class="text-secondary">
+                                    {% if object.delivery_date %}{{ object.delivery_date|date:"F j, Y" }}{% else %}N/A{% endif %}
+                                </span>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <h5 class="text-muted text-uppercase mb-3">Item Details</h5>
+                        <ul class="list-unstyled detail-list">
+                            <li class="mb-2">
+                                <span class="fw-bold">Quantity Ordered:</span> 
+                                <span class="badge text-bg-secondary">{{ object.quantity }} units</span>
+                            </li>
+                            <li class="mb-2">
+                                <span class="fw-bold">Unit Price:</span> 
+                                <span class="text-secondary">${{ object.price|floatformat:2 }}</span>
+                            </li>
+                            <li class="mb-2">
+                                <span class="fw-bold">Description:</span> 
+                                <span class="text-secondary">{{ object.description|default:"None provided." }}</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="mt-4 pt-4 border-top">
+                    <h5 class="text-muted text-uppercase mb-3">Notes & Audit</h5>
+                    <p class="text-secondary">Additional transaction notes or system audit details can be placed here.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            {# ADDED shadow-lg and used var(--primary-color) for the title #}
+            <div class="card p-4 sticky-top shadow-lg" style="top: 20px;">
+                <h4 class="mb-4" style="color: var(--primary-color);">Financial Summary</h4>
+                
+                <ul class="list-unstyled detail-list">
+                    <li class="mb-2">
+                        <span class="fw-bold">Unit Price:</span> 
+                        <span class="fs-5 text-secondary float-end">${{ object.price|floatformat:2 }}</span>
+                    </li>
+                    <li class="mb-2">
+                        <span class="fw-bold">Quantity:</span> 
+                        <span class="fs-5 text-secondary float-end">{{ object.quantity }}</span>
+                    </li>
+                </ul>
+
+                {# CORRECTED: Used var(--primary-color) for the total box background #}
+                <div class="d-flex justify-content-between align-items-center mb-4 p-3 rounded-3 mt-3" style="background-color: var(--primary-color); color: #fff;">
+                    <div>
+                        <strong class="d-block text-uppercase">Total Cost (Value)</strong>
+                    </div>
+                    <div>
+                        <span class="fs-4 fw-bold">${{ object.total_value|floatformat:2 }}</span>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

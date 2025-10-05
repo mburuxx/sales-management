@@ -1,0 +1,508 @@
+[
+  {
+    "model": "auth.user",
+    "pk": 1,
+    "fields": {
+      "username": "admin_user",
+      "email": "admin@store.com",
+      "is_staff": true,
+      "is_superuser": true,
+      "password": "pbkdf2_sha256$260000$g7hI4gqU3jK2iL5oP9rS1tVwXyZ0aBcD$mFvKjHlOpQwRsTxYuZwAxByCzD0eF1gH2iJ3kL4mN5oP6qR7sT8uV9wXyZ0aB",
+      "last_login": "2024-01-01T00:00:00Z",
+      "date_joined": "2024-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "auth.user",
+    "pk": 2,
+    "fields": {
+      "username": "executive_op",
+      "email": "exec@store.com",
+      "password": "pbkdf2_sha256$260000$g7hI4gqU3jK2iL5oP9rS1tVwXyZ0aBcD$mFvKjHlOpQwRsTxYuZwAxByCzD0eF1gH2iJ3kL4mN5oP6qR7sT8uV9wXyZ0aB",
+      "last_login": "2024-01-01T00:00:00Z",
+      "date_joined": "2024-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "auth.user",
+    "pk": 3,
+    "fields": {
+      "username": "operative",
+      "email": "op@store.com",
+      "password": "pbkdf2_sha256$260000$g7hI4gqU3jK2iL5oP9rS1tVwXyZ0aBcD$mFvKjHlOpQwRsTxYuZwAxByCzD0eF1gH2iJ3kL4mN5oP6qR7sT8uV9wXyZ0aB",
+      "last_login": "2024-01-01T00:00:00Z",
+      "date_joined": "2024-01-01T00:00:00Z"
+    }
+  },
+
+  {
+    "model": "accounts.profile",
+    "pk": 1,
+    "fields": {
+      "user": 1,
+      "slug": "admin-user",
+      "telephone": "+1234567890",
+      "first_name": "Alice",
+      "last_name": "Admin",
+      "status": "A",
+      "role": "AD"
+    }
+  },
+  {
+    "model": "accounts.profile",
+    "pk": 2,
+    "fields": {
+      "user": 2,
+      "slug": "executive-op",
+      "telephone": "+1234567891",
+      "first_name": "Bob",
+      "last_name": "Executive",
+      "status": "A",
+      "role": "EX"
+    }
+  },
+  {
+    "model": "accounts.profile",
+    "pk": 3,
+    "fields": {
+      "user": 3,
+      "slug": "operative-user",
+      "telephone": "+1234567892",
+      "first_name": "Charlie",
+      "last_name": "Operative",
+      "status": "A",
+      "role": "OP"
+    }
+  },
+  
+  {
+    "model": "accounts.vendor",
+    "pk": 1,
+    "fields": {
+      "name": "Global Tech Supply",
+      "slug": "global-tech-supply",
+      "phone_number": 5551234567,
+      "address": "450 Industrial Blvd"
+    }
+  },
+  {
+    "model": "accounts.vendor",
+    "pk": 2,
+    "fields": {
+      "name": "Local Fresh Foods",
+      "slug": "local-fresh-foods",
+      "phone_number": 5559876543,
+      "address": "100 Market St"
+    }
+  },
+
+  {
+    "model": "accounts.customer",
+    "pk": 1,
+    "fields": {
+      "first_name": "Diana",
+      "last_name": "Prince",
+      "address": "400 Themyscira Way",
+      "email": "diana@mail.com",
+      "phone": "5551112222",
+      "loyalty_points": 50
+    }
+  },
+  {
+    "model": "accounts.customer",
+    "pk": 2,
+    "fields": {
+      "first_name": "Bruce",
+      "last_name": "Wayne",
+      "address": "120 Gotham Ave",
+      "email": "bruce@mail.com",
+      "phone": "5553334444",
+      "loyalty_points": 120
+    }
+  },
+
+  {
+    "model": "store.category",
+    "pk": 1,
+    "fields": {
+      "name": "Electronics",
+      "slug": "electronics"
+    }
+  },
+  {
+    "model": "store.category",
+    "pk": 2,
+    "fields": {
+      "name": "Groceries",
+      "slug": "groceries"
+    }
+  },
+  {
+    "model": "store.category",
+    "pk": 3,
+    "fields": {
+      "name": "Office Supplies",
+      "slug": "office-supplies"
+    }
+  },
+
+  {
+    "model": "store.item",
+    "pk": 1,
+    "fields": {
+      "name": "Laptop Pro",
+      "slug": "laptop-pro",
+      "description": "High-performance laptop.",
+      "category": 1,
+      "quantity": 50,
+      "price": 1200.00,
+      "vendor": 1
+    }
+  },
+  {
+    "model": "store.item",
+    "pk": 2,
+    "fields": {
+      "name": "Smartphone X",
+      "slug": "smartphone-x",
+      "description": "Latest generation mobile phone.",
+      "category": 1,
+      "quantity": 100,
+      "price": 800.00,
+      "vendor": 1
+    }
+  },
+  {
+    "model": "store.item",
+    "pk": 3,
+    "fields": {
+      "name": "Wireless Mouse",
+      "slug": "wireless-mouse",
+      "description": "Ergonomic wireless mouse.",
+      "category": 1,
+      "quantity": 200,
+      "price": 25.00,
+      "vendor": 1
+    }
+  },
+  {
+    "model": "store.item",
+    "pk": 4,
+    "fields": {
+      "name": "4K Monitor",
+      "slug": "4k-monitor",
+      "description": "27-inch 4K display.",
+      "category": 1,
+      "quantity": 30,
+      "price": 350.00,
+      "vendor": 1
+    }
+  },
+  {
+    "model": "store.item",
+    "pk": 5,
+    "fields": {
+      "name": "Organic Apples",
+      "slug": "organic-apples",
+      "description": "Fresh organic apples.",
+      "category": 2,
+      "quantity": 500,
+      "price": 2.50,
+      "expiring_date": "2025-10-30",
+      "vendor": 2
+    }
+  },
+  {
+    "model": "store.item",
+    "pk": 6,
+    "fields": {
+      "name": "Milk (Litre)",
+      "slug": "milk-litre",
+      "description": "Whole milk, 1 litre.",
+      "category": 2,
+      "quantity": 300,
+      "price": 1.50,
+      "expiring_date": "2025-10-15",
+      "vendor": 2
+    }
+  },
+  {
+    "model": "store.item",
+    "pk": 7,
+    "fields": {
+      "name": "Premium Coffee",
+      "slug": "premium-coffee",
+      "description": "Roasted coffee beans.",
+      "category": 2,
+      "quantity": 150,
+      "price": 15.00,
+      "vendor": 2
+    }
+  },
+  {
+    "model": "store.item",
+    "pk": 8,
+    "fields": {
+      "name": "A4 Printer Paper",
+      "slug": "a4-printer-paper",
+      "description": "500 sheets of white paper.",
+      "category": 3,
+      "quantity": 400,
+      "price": 5.00,
+      "vendor": 1
+    }
+  },
+  {
+    "model": "store.item",
+    "pk": 9,
+    "fields": {
+      "name": "Gel Pens (12-pack)",
+      "slug": "gel-pens-12-pack",
+      "description": "Smooth writing gel pens.",
+      "category": 3,
+      "quantity": 120,
+      "price": 8.00,
+      "vendor": 1
+    }
+  },
+  {
+    "model": "store.item",
+    "pk": 10,
+    "fields": {
+      "name": "Stapler",
+      "slug": "stapler",
+      "description": "Heavy-duty stapler.",
+      "category": 3,
+      "quantity": 80,
+      "price": 12.00,
+      "vendor": 1
+    }
+  },
+
+  {
+    "model": "sales.sale",
+    "pk": 1,
+    "fields": {
+      "date_added": "2025-09-01T10:00:00Z",
+      "customer": 1,
+      "sub_total": 850.00,
+      "grand_total": 892.50,
+      "tax_amount": 42.50,
+      "tax_percentage": 5.0,
+      "amount_paid": 900.00,
+      "amount_change": 7.50
+    }
+  },
+  {
+    "model": "sales.saledetail",
+    "pk": 1,
+    "fields": {
+      "sale": 1,
+      "item": 2,
+      "price": 800.00,
+      "quantity": 1,
+      "total_detail": 800.00
+    }
+  },
+  {
+    "model": "sales.saledetail",
+    "pk": 2,
+    "fields": {
+      "sale": 1,
+      "item": 3,
+      "price": 25.00,
+      "quantity": 2,
+      "total_detail": 50.00
+    }
+  },
+
+  {
+    "model": "sales.sale",
+    "pk": 2,
+    "fields": {
+      "date_added": "2025-09-01T11:00:00Z",
+      "customer": 2,
+      "sub_total": 1200.00,
+      "grand_total": 1260.00,
+      "tax_amount": 60.00,
+      "tax_percentage": 5.0,
+      "amount_paid": 1300.00,
+      "amount_change": 40.00
+    }
+  },
+  {
+    "model": "sales.saledetail",
+    "pk": 3,
+    "fields": {
+      "sale": 2,
+      "item": 1,
+      "price": 1200.00,
+      "quantity": 1,
+      "total_detail": 1200.00
+    }
+  },
+  
+  {
+    "model": "sales.sale",
+    "pk": 3,
+    "fields": {
+      "date_added": "2025-09-15T15:00:00Z",
+      "customer": 1,
+      "sub_total": 24.50,
+      "grand_total": 25.73,
+      "tax_amount": 1.23,
+      "tax_percentage": 5.0,
+      "amount_paid": 30.00,
+      "amount_change": 4.27
+    }
+  },
+  {
+    "model": "sales.saledetail",
+    "pk": 4,
+    "fields": {
+      "sale": 3,
+      "item": 5,
+      "price": 2.50,
+      "quantity": 5,
+      "total_detail": 12.50
+    }
+  },
+  {
+    "model": "sales.saledetail",
+    "pk": 5,
+    "fields": {
+      "sale": 3,
+      "item": 7,
+      "price": 15.00,
+      "quantity": 1,
+      "total_detail": 15.00
+    }
+  },
+
+  {
+    "model": "sales.sale",
+    "pk": 4,
+    "fields": {
+      "date_added": "2025-09-15T16:00:00Z",
+      "customer": 2,
+      "sub_total": 20.00,
+      "grand_total": 21.00,
+      "tax_amount": 1.00,
+      "tax_percentage": 5.0,
+      "amount_paid": 21.00,
+      "amount_change": 0.00
+    }
+  },
+  {
+    "model": "sales.saledetail",
+    "pk": 6,
+    "fields": {
+      "sale": 4,
+      "item": 8,
+      "price": 5.00,
+      "quantity": 4,
+      "total_detail": 20.00
+    }
+  },
+  
+  {
+    "model": "sales.sale",
+    "pk": 5,
+    "fields": {
+      "date_added": "2025-10-01T09:00:00Z",
+      "customer": 1,
+      "sub_total": 350.00,
+      "grand_total": 367.50,
+      "tax_amount": 17.50,
+      "tax_percentage": 5.0,
+      "amount_paid": 400.00,
+      "amount_change": 32.50
+    }
+  },
+  {
+    "model": "sales.saledetail",
+    "pk": 7,
+    "fields": {
+      "sale": 5,
+      "item": 4,
+      "price": 350.00,
+      "quantity": 1,
+      "total_detail": 350.00
+    }
+  },
+  
+  {
+    "model": "sales.sale",
+    "pk": 6,
+    "fields": {
+      "date_added": "2025-10-01T10:00:00Z",
+      "customer": 2,
+      "sub_total": 96.00,
+      "grand_total": 100.80,
+      "tax_amount": 4.80,
+      "tax_percentage": 5.0,
+      "amount_paid": 110.00,
+      "amount_change": 9.20
+    }
+  },
+  {
+    "model": "sales.saledetail",
+    "pk": 8,
+    "fields": {
+      "sale": 6,
+      "item": 9,
+      "price": 8.00,
+      "quantity": 12,
+      "total_detail": 96.00
+    }
+  },
+
+  {
+    "model": "sales.purchase",
+    "pk": 1,
+    "fields": {
+      "slug": "organic-apples",
+      "item": 5,
+      "description": "Restock of organic apples.",
+      "vendor": 2,
+      "order_date": "2025-08-20T10:00:00Z",
+      "delivery_date": "2025-08-25T10:00:00Z",
+      "quantity": 200,
+      "delivery_status": "S",
+      "price": 1.50,
+      "total_value": 300.00
+    }
+  },
+  {
+    "model": "sales.purchase",
+    "pk": 2,
+    "fields": {
+      "slug": "office-staplers",
+      "item": 10,
+      "description": "Restock of office staplers.",
+      "vendor": 1,
+      "order_date": "2025-09-05T10:00:00Z",
+      "delivery_date": "2025-09-10T10:00:00Z",
+      "quantity": 50,
+      "delivery_status": "S",
+      "price": 10.00,
+      "total_value": 500.00
+    }
+  },
+  {
+    "model": "sales.purchase",
+    "pk": 3,
+    "fields": {
+      "slug": "smartphone-order",
+      "item": 2,
+      "description": "Order for 50 new Smartphones.",
+      "vendor": 1,
+      "order_date": "2025-09-25T10:00:00Z",
+      "delivery_date": null,
+      "quantity": 50,
+      "delivery_status": "P",
+      "price": 750.00,
+      "total_value": 37500.00
+    }
+  }
+]

@@ -24,8 +24,7 @@ urlpatterns = [
     # Purchase URLs
     path('purchases/', PurchaseListView.as_view(), name='purchases-list'),
     path(
-         'purchase/<slug:slug>/', PurchaseDetailView.as_view(),
-         name='purchase-detail'
+         'purchase/<int:pk>/', PurchaseDetailView.as_view(), name='purchase-detail'
      ),
     path(
          'new-purchase/', PurchaseCreateView.as_view(),

@@ -23,6 +23,8 @@ from store.models import Item
 from accounts.models import Customer
 from .models import Sale, Purchase, SaleDetail
 from .forms import PurchaseForm
+from store.mixins import PermissionDeniedMixin
+from accounts.models import UserRole
 
 # log errors and info
 logger = logging.getLogger(__name__)
@@ -271,25 +273,25 @@ def SaleCreateView(request):
     return render(request, "sales/sales_create.html", context=context)
 
 
-class SaleDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+class SaleDeleteView(LoginRequiredMixin, PermissionDeniedMixin, DeleteView):
     """
     View to delete a sale.
     """
 
     model = Sale
-    template_name = "transactions/sale_delete.html"
+    template_name = "sale/sales_delete.html"
 
     def get_success_url(self):
         """
         Redirect to the sales list after successful deletion.
         """
-        return reverse("saleslist")
+        return reverse("sales-list")
 
     def test_func(self):
         """
-        Allow deletion only for superusers.
+        Allow deletion only for superusers or users with specific roles.
         """
-        return self.request.user.is_superuser
+        return self.request.user.get_role() in [UserRole.ADMIN, UserRole.EXECUTIVE]
 
 
 class PurchaseListView(LoginRequiredMixin, ListView):
@@ -298,7 +300,7 @@ class PurchaseListView(LoginRequiredMixin, ListView):
     """
 
     model = Purchase
-    template_name = "transactions/purchases_list.html"
+    template_name = "sales/purchases_list.html"
     context_object_name = "purchases"
     paginate_by = 10
 
@@ -309,7 +311,7 @@ class PurchaseDetailView(LoginRequiredMixin, DetailView):
     """
 
     model = Purchase
-    template_name = "transactions/purchase_detail.html"
+    template_name = "sales/purchase_detail.html"
 
 
 class PurchaseCreateView(LoginRequiredMixin, CreateView):
@@ -319,13 +321,13 @@ class PurchaseCreateView(LoginRequiredMixin, CreateView):
 
     model = Purchase
     form_class = PurchaseForm
-    template_name = "transactions/purchases_form.html"
+    template_name = "sales/purchase_form.html"
 
     def get_success_url(self):
         """
         Redirect to the purchases list after successful form submission.
         """
-        return reverse("purchaseslist")
+        return reverse("purchases-list")
 
 
 class PurchaseUpdateView(LoginRequiredMixin, UpdateView):
@@ -335,13 +337,13 @@ class PurchaseUpdateView(LoginRequiredMixin, UpdateView):
 
     model = Purchase
     form_class = PurchaseForm
-    template_name = "transactions/purchases_form.html"
+    template_name = "sales/purchase_form.html"
 
     def get_success_url(self):
         """
         Redirect to the purchases list after successful form submission.
         """
-        return reverse("purchaseslist")
+        return reverse("purchases-list")
 
 
 class PurchaseDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
@@ -350,7 +352,7 @@ class PurchaseDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     """
 
     model = Purchase
-    template_name = "transactions/purchase_delete.html"
+    template_name = "sales/purchase_delete.html"
 
     def get_success_url(self):
         """

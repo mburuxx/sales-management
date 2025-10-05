@@ -3,14 +3,13 @@
 {% load render_table from django_tables2 %}
 {% load querystring from django_tables2 %}
 
-{% block title %}Sales{% endblock title %}
+{% block title %}Purchases{% endblock title %}
 
 {% block stylesheets %}
 <style>
-    /* Import styles from product-list for consistency */
-    /* Table Styling */
+    /* Table Styling (Using base theme variables) */
     .table-container {
-        padding: 0 1rem; /* Adjust padding for the table area */
+        padding: 0 1rem;
     }
 
     .custom-table {
@@ -19,17 +18,17 @@
         border: none;
         box-shadow: var(--card-shadow);
         border-radius: 0.5rem;
-        overflow: hidden; /* Important for rounding corners */
+        overflow: hidden;
     }
 
     .custom-table thead th {
-        background-color: var(--sidebar-header-bg); /* Dark header for a bold look */
+        background-color: var(--sidebar-header-bg); /* Dark header from base */
         color: #fff;
         font-weight: 600;
         border: none;
         padding: 1rem 1rem;
         vertical-align: middle;
-        text-align: left; /* Keep consistency in text alignment */
+        text-align: left;
     }
 
     .custom-table tbody tr {
@@ -45,23 +44,15 @@
         border-top: 1px solid #e5e7eb; /* Light separator */
         padding: 0.75rem 1rem;
         vertical-align: middle;
+        text-align: left;
     }
     
     .custom-table .action-col {
-        min-width: 150px; /* Adjusted to fit two buttons */
-        text-align: center; /* Center the actions */
+        min-width: 150px; 
+        text-align: center;
     }
     
-    /* Ensure other columns are left-aligned by default, matching product-list */
-    .custom-table tbody td {
-        text-align: left;
-    }
-    .custom-table tbody td:first-child {
-        font-weight: 500;
-    }
-
-
-    /* Pagination Styling (Copied from base.html) */
+    /* Pagination Styling (Using base theme variables) */
     .pagination .page-item.active .page-link {
         background-color: var(--primary-color);
         border-color: var(--primary-color);
@@ -77,6 +68,14 @@
         background-color: rgba(13, 110, 253, 0.1);
     }
     
+    /* Custom badge styles for purchase list (keeping soft colors for visual difference in data) */
+    .bg-soft-danger {
+        background-color: #f8d7da;
+    }
+    .bg-soft-success {
+        background-color: #d1e7dd;
+    }
+    
 </style>
 {% endblock stylesheets %}
 
@@ -87,19 +86,20 @@
         <div class="card p-4">
             <div class="row align-items-center">
                 <div class="col-md-6">
-                    <h4 class="display-6 mb-0" style="color: var(--primary-color);">Sales Orders</h4> 
+                    {# Title uses the standard primary color #}
+                    <h4 class="display-6 mb-0" style="color: var(--primary-color);">Purchase Orders</h4> 
                 </div>
                 <div class="col-md-6 d-flex justify-content-end gap-2">
-                    <a class="btn btn-primary btn-sm rounded-pill shadow-sm" href="{% url 'sales-create' %}">
-                        <i class="fa-solid fa-plus me-1"></i> Add Sale Order
+                    {# Button uses the standard primary color #}
+                    <a class="btn btn-primary btn-sm rounded-pill shadow-sm" href="{% url 'purchase-create' %}">
+                        <i class="fa-solid fa-plus me-1"></i> Add Purchase Order
                     </a>
-                    <a class="btn btn-outline-secondary btn-sm rounded-pill shadow-sm" href="#">
+                    <a class="btn btn-outline-secondary btn-sm rounded-pill shadow-sm" href="{% url 'purchases-export' %}">
                         <i class="fa-solid fa-download me-1"></i> Export to Excel
                     </a>
                 </div>
             </div>
-            
-            </div>
+        </div>
     </div>
 
     <div class="table-container">
@@ -108,36 +108,46 @@
                 <thead class="thead-dark">
                     <tr>
                         <th scope="col">ID</th>
-                        <th scope="col">Date</th>
-                        <th scope="col">Customer</th>
-                        <th scope="col">Sub Total</th>
-                        <th scope="col">Tax (%)</th>
-                        <th scope="col">Tax Amt</th>
-                        <th scope="col">Grand Total</th>
-                        <th scope="col">Paid</th>
-                        <th scope="col">Change</th>
+                        <th scope="col">Product Name</th>
+                        <th scope="col">Vendor</th>
+                        <th scope="col">Quantity</th>
+                        <th scope="col" class="text-end">Total Value</th>
+                        <th scope="col">Order Date</th>
+                        <th scope="col">Delivery Status</th>
                         <th scope="col" class="action-col text-center">Action</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {% for sale in sales %}
+                    {% for purchase in purchases %}
                     <tr>
-                        <th scope="row">{{ sale.id }}</th>
-                        <td>{{ sale.date_added|date:"Y-m-d H:i" }}</td>
-                        <td>{{ sale.customer }}</td>
-                        <td>${{ sale.sub_total }}</td>
-                        <td>{{ sale.tax_percentage }}%</td>
-                        <td>${{ sale.tax_amount }}</td>
-                        <td><strong class="text-primary">${{ sale.grand_total }}</strong></td> 
-                        <td>${{ sale.amount_paid }}</td>
-                        <td>${{ sale.amount_change }}</td>
+                        <th scope="row">{{ purchase.id }}</th>
+                        <td><a href="{% url 'purchase-detail' purchase.id %}" class="text-dark fw-bold" style="text-decoration: none;">{{ purchase.item.name }}</a></td>
+                        <td>{{ purchase.vendor.name }}</td>
+                        <td>{{ purchase.quantity }}</td>
+                        {# The value is highlighted with text-primary, matching the Sales Total highlighting #}
+                        <td class="text-end"><strong class="text-primary">${{ purchase.total_value|floatformat:2 }}</strong></td>
+                        <td>{{ purchase.order_date|date:"Y-m-d H:i" }}</td>
+                        <td>
+                            {% if purchase.delivery_status == 'P' %}
+                                <span class="badge bg-soft-danger text-danger p-2">
+                                    <i class="fa-solid fa-clock me-1"></i> Pending
+                                </span>
+                            {% else %} 
+                                <span class="badge bg-soft-success text-success p-2">
+                                    <i class="fa-solid fa-check-circle me-1"></i> {{ purchase.get_delivery_status_display }}
+                                </span>
+                            {% endif %}
+                        </td>
                         <td class="action-col text-center">
                             <div class="d-flex gap-2 justify-content-center">
-                                <a class="btn btn-outline-primary btn-sm" href="{% url 'sales-detail' sale.id %}" title="View Details">
+                                <a class="btn btn-outline-primary btn-sm" href="{% url 'purchase-detail' purchase.id %}" title="View Details">
                                     <i class="fa-solid fa-eye"></i>
                                 </a>
+                                <a class="btn btn-outline-info btn-sm" href="{% url 'purchase-update' purchase.id %}" title="Edit Purchase">
+                                    <i class="fa-solid fa-pen"></i>
+                                </a>
                                 {% if request.user.is_superuser %}
-                                <a class="btn btn-outline-danger btn-sm" href="{% url 'sales-delete' sale.id %}" title="Delete Sale">
+                                <a class="btn btn-outline-danger btn-sm" href="{% url 'purchase-delete' purchase.id %}" title="Delete Purchase">
                                     <i class="fa-solid fa-trash-can"></i>
                                 </a>
                                 {% endif %}
@@ -146,7 +156,7 @@
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="10" class="text-center text-muted py-4">No sales orders found.</td>
+                        <td colspan="8" class="text-center text-muted py-4">No purchase orders found.</td>
                     </tr>
                     {% endfor %}
                 </tbody>

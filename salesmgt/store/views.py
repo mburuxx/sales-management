@@ -39,7 +39,7 @@ from django_tables2.export.views import ExportMixin
 
 # Local app imports
 from accounts.models import Profile, Vendor
-#from transactions.models import Sale
+from sales.models import Sale
 from .models import Category, Item, Delivery
 from .forms import ItemForm, CategoryForm, DeliveryForm
 from .tables import ItemTable
@@ -47,35 +47,53 @@ from .mixins import PermissionDeniedMixin
 from accounts.models import UserRole
 
 
+import json # <-- ADD THIS IMPORT
+
+
 @login_required
 def dashboard(request):
     profiles = Profile.objects.all()
-    Category.objects.annotate(nitem=Count("item"))
+    # Note: Category.objects.annotate(nitem=Count("item")) is redundant here.
     items = Item.objects.all()
+    
+    # 1. Dashboard Cards Data
     total_items = (
         Item.objects.all()
         .aggregate(Sum("quantity"))
-        .get("quantity__sum", 0.00)
+        .get("quantity__sum", 0) # Use 0 instead of 0.00 for cleaner aggregate
     )
     items_count = items.count()
     profiles_count = profiles.count()
 
-    # Prepare data for charts
-    category_counts = Category.objects.annotate(
+    # 2. Chart Data: Category Distribution
+    category_data = Category.objects.annotate(
         item_count=Count("item")
     ).values("name", "item_count")
-    categories = [cat["name"] for cat in category_counts]
-    category_counts = [cat["item_count"] for cat in category_counts]
+    
+    categories = [cat["name"] for cat in category_data]
+    category_counts = [cat["item_count"] for cat in category_data]
 
-    #sale_dates = (
-    #    Sale.objects.values("date_added__date")
-    #   .annotate(total_sales=Sum("grand_total"))
-    #    .order_by("date_added__date")
-    #)
-    #sale_dates_labels = [
-    #    date["date_added__date"].strftime("%Y-%m-%d") for date in sale_dates
-    #]
-    #sale_dates_values = [float(date["total_sales"]) for date in sale_dates]
+    # 3. Chart Data: Sales Over Time
+    sale_dates = (
+        Sale.objects.values("date_added__date")
+        .annotate(total_sales=Sum("grand_total"))
+        .order_by("date_added__date")
+    )
+    
+    sale_dates_labels = [
+        date["date_added__date"].strftime("%Y-%m-%d") for date in sale_dates
+    ]
+    # Ensure total_sales is converted to float for JSON compatibility
+    sale_dates_values = [float(date["total_sales"]) for date in sale_dates] 
+
+    
+    # 4. JSON Serialization for Charts
+    # These must be JSON strings for the template's JSON.parse() to work
+    categories_json = json.dumps(categories)
+    category_counts_json = json.dumps(category_counts)
+    sale_dates_labels_json = json.dumps(sale_dates_labels)
+    sale_dates_values_json = json.dumps(sale_dates_values)
+
 
     context = {
         "items": items,
@@ -85,12 +103,15 @@ def dashboard(request):
         "total_items": total_items,
         "vendors": Vendor.objects.all(),
         "delivery": Delivery.objects.all(),
-        #"sales": Sale.objects.all(),
-        "categories": categories,
-        "category_counts": category_counts,
-        #"sale_dates_labels": sale_dates_labels,
-        #"sale_dates_values": sale_dates_values,
+        "sales": Sale.objects.all(),
+        
+        # Pass JSON strings for the charts
+        "categories": categories_json,
+        "category_counts": category_counts_json,
+        "sale_dates_labels": sale_dates_labels_json,
+        "sale_dates_values": sale_dates_values_json,
     }
+    
     return render(request, "store/dashboard.html", context)
 
 
