@@ -151,7 +151,7 @@ class SaleDetailView(LoginRequiredMixin, DetailView):
     """
 
     model = Sale
-    template_name = "transactions/sale_detail.html"
+    template_name = "sales/sales_detail.html"
 
 
 def SaleCreateView(request):
@@ -268,7 +268,7 @@ def SaleCreateView(request):
                         )
                     }, status=500)
 
-    return render(request, "transactions/sale_create.html", context=context)
+    return render(request, "sales/sales_create.html", context=context)
 
 
 class SaleDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):

@@ -90,7 +90,7 @@
                     <h4 class="display-6 mb-0" style="color: var(--primary-color);">Sales Orders</h4> 
                 </div>
                 <div class="col-md-6 d-flex justify-content-end gap-2">
-                    <a class="btn btn-primary btn-sm rounded-pill shadow-sm" href="#">
+                    <a class="btn btn-primary btn-sm rounded-pill shadow-sm" href="{% url 'sales-create' %}">
                         <i class="fa-solid fa-plus me-1"></i> Add Sale Order
                     </a>
                     <a class="btn btn-outline-secondary btn-sm rounded-pill shadow-sm" href="#">
@@ -132,7 +132,7 @@
                         <td>${{ sale.amount_paid }}</td>
                         <td>${{ sale.amount_change }}</td>
                         <td class="action-col text-center">
-                            <a class="btn btn-outline-primary btn-sm" href="#">
+                            <a class="btn btn-outline-primary btn-sm" href="{% url 'sales-detail' sale.id %}">
                                 <i class="fa-solid fa-eye me-1"></i> View Details
                             </a>
                         </td>

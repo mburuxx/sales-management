@@ -42,11 +42,11 @@ urlpatterns = [
 
     # Sale URLs
     path('sales/', SaleListView.as_view(), name='sales-list'),
-    path('sale/<int:pk>/', SaleDetailView.as_view(), name='sale-detail'),
-    path('new-sale/', SaleCreateView, name='sale-create'),
+    path('sale/<int:pk>/', SaleDetailView.as_view(), name='sales-detail'),
+    path('new-sale/', SaleCreateView, name='sales-create'),
     path(
          'sale/<slug:slug>/delete/', SaleDeleteView.as_view(),
-         name='sale-delete'
+         name='sales-delete'
      ),
 
     # Sales and purchases export
