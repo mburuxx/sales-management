@@ -1,9 +1,7 @@
 from django import forms
 from .models import Item, Category, Delivery
-
-
-from django import forms
-from .models import Item
+from accounts.models import Customer
+from phonenumber_field.formfields import PhoneNumberField
 
 class ItemForm(forms.ModelForm):
     """
@@ -48,14 +46,11 @@ class ItemForm(forms.ModelForm):
 
     def clean_quantity(self):
         """ Validation for the quantity field. """
-        # Get the value submitted by the user.
         quantity = self.cleaned_data.get('quantity')
 
-        # Check if the quantity is less than 1.
         if quantity is not None and quantity < 1:
             raise forms.ValidationError("The quantity must be 1 or greater.")
 
-        # If the validation passes, you must return the cleaned value.
         return quantity
 
     def clean_price(self):
@@ -86,17 +81,9 @@ class CategoryForm(forms.ModelForm):
             'name': 'Category Name',
         }
 
-
-# store/forms.py
-
-from django import forms
-from .models import Delivery
-from accounts.models import Customer
-from phonenumber_field.formfields import PhoneNumberField
-
 class DeliveryForm(forms.ModelForm):
-    # 1. NEW FIELD: ModelChoiceField for existing customers
-    # We set required=False here because the customer might be created via the other fields.
+
+    # Set required=False here because the customer might be created via the other fields.
     existing_customer = forms.ModelChoiceField(
         queryset=Customer.objects.all().order_by('first_name'),
         required=False,
@@ -105,7 +92,7 @@ class DeliveryForm(forms.ModelForm):
         widget=forms.Select(attrs={'class': 'form-control select2-enabled'})
     )
 
-    # 2. FIELDS for creating a NEW customer (Optional)
+    # Fields for creating a new customer if not selecting an existing one
     new_customer_first_name = forms.CharField(
         max_length=256, required=False, label="New Customer First Name",
         widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Only fill if new customer'})
@@ -121,7 +108,6 @@ class DeliveryForm(forms.ModelForm):
 
     class Meta:
         model = Delivery
-        # The 'customer' field is the Foreign Key we want to ultimately save to
         fields = ['item', 'date', 'is_delivered'] 
         widgets = {
             'item': forms.Select(attrs={'class': 'form-control'}),
@@ -131,7 +117,6 @@ class DeliveryForm(forms.ModelForm):
         
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Apply form-control class to all auto-generated fields
         for field in self.fields:
             if field not in ['is_delivered', 'existing_customer', 'new_customer_phone']:
                 self.fields[field].widget.attrs.update({'class': 'form-control'})
@@ -145,21 +130,17 @@ class DeliveryForm(forms.ModelForm):
 
         is_new_customer = bool(new_first_name or new_phone)
 
-        # 3. Validation Logic
         if existing_customer and is_new_customer:
-            # Error: Cannot select an existing customer AND fill out new customer details
             raise forms.ValidationError(
                 "Please either select an existing customer OR fill out the new customer details, not both."
             )
         
         if not existing_customer and not is_new_customer:
-            # Error: Must provide customer information
             raise forms.ValidationError(
                 "You must either select an existing customer or provide details for a new one."
             )
 
         if is_new_customer:
-            # If creating a new customer, ensure required fields are present
             if not new_first_name:
                  self.add_error('new_customer_first_name', "First Name is required for a new customer.")
             if not new_phone:

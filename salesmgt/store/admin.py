@@ -12,7 +12,6 @@ This module defines the following admin classes:
 from django.contrib import admin
 from .models import Category, Item, Delivery
 
-
 class CategoryAdmin(admin.ModelAdmin):
     """
     Admin configuration for the Category model.
@@ -42,7 +41,6 @@ class DeliveryAdmin(admin.ModelAdmin):
     search_fields = ('item__name', 'customer__name')
     list_filter = ('is_delivered', 'date')
     ordering = ('-date',)
-
 
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(Item, ItemAdmin)

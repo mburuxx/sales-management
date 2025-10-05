@@ -1,7 +1,6 @@
 import django_tables2 as tables
 from .models import Item, Delivery
 
-
 class ItemTable(tables.Table):
     """
     Table representation for Item model.
@@ -14,7 +13,6 @@ class ItemTable(tables.Table):
             'selling_price', 'expiring_date', 'vendor'
         )
         order_by_field = 'sort'
-
 
 class DeliveryTable(tables.Table):
     """

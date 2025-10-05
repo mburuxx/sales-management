@@ -6,7 +6,6 @@
 
 {% block stylesheets %}
 <style>
-    /* General Table Styling from Product Template */
     .table-container {
         padding: 0 1rem;
     }
@@ -68,13 +67,12 @@
         border-color: #0b5ed7;
     }
 
-    /* Delivery Status Badges */
     .badge-pending {
-        background-color: #ffc107; /* warning color */
-        color: #212529; /* dark text */
+        background-color: #ffc107;
+        color: #212529; 
     }
     .badge-delivered {
-        background-color: #198754; /* success color */
+        background-color: #198754; 
         color: #fff;
     }
     
@@ -84,12 +82,10 @@
 {% block content %}
 <div class="container-fluid">
 
-    <!-- Header Section (Sleek Card - Matching Product List Style) -->
     <div class="my-4">
         <div class="card p-4 shadow-sm border-0">
             <div class="row align-items-center">
                 <div class="col-md-6">
-                    <!-- Blue Headline -->
                     <h4 class="display-6 mb-0" style="color: var(--primary-color);">Delivery Schedule</h4>
                 </div>
                 <div class="col-md-6 d-flex justify-content-end gap-2">
@@ -102,8 +98,6 @@
                 </div>
             </div>
             
-            <!-- Single Search Form (Matches Product List Style) -->
-            <!-- Form submits to the same URL, letting DeliverySearchListView handle the 'q' parameter -->
             <form class="input-group mt-4 search-input-group" style="max-width: 500px;" role="search" method="get" action="{% url 'deliveries' %}">
                 <input id="searchbox" name="q" type="text" class="form-control rounded-start-pill" 
                        placeholder="Search by customer name or item name"
@@ -122,7 +116,6 @@
         </div>
     </div>
 
-    <!-- Table Section (Manual Table Loop) -->
     <div class="table-container">
         <div class="card p-0 custom-table-wrapper">
             <table class="table custom-table mb-0">
@@ -139,7 +132,6 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <!-- The 'deliveries' context variable is provided by the ListView -->
                     {% for delivery in deliveries %}
                     <tr>
                         <th scope="row">{{ delivery.id }}</th>
@@ -187,7 +179,6 @@
         </div>
     </div>
 
-    <!-- Pagination (Ensuring search query is carried over) -->
     {% if is_paginated %}
     <nav aria-label="Page navigation" class="mt-4 pb-4">
         <ul class="pagination justify-content-center">

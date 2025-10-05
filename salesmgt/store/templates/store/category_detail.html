@@ -9,7 +9,6 @@
         <div class="col-lg-10">
             <div class="card shadow-lg border-0 rounded-lg">
                 
-                <!-- Header -->
                 <div class="card-header bg-white border-bottom p-4">
                     <h2 class="fw-bold mb-0" style="color: var(--primary-color);">Category Details</h2>
                 </div>
@@ -19,13 +18,11 @@
                     <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
                         <div>
                             <h1 class="display-5 fw-bolder mb-1 text-dark">{{ category.name }}</h1>
-                            <!-- Display the short description -->
                             <p class="text-muted lead">{{ category.short_description|default:"No description provided." }}</p>
                         </div>
                         <span class="badge bg-secondary rounded-pill p-2 px-3">ID: {{ category.pk }}</span>
                     </div>
 
-                    <!-- Statistics/Related Data -->
                     <div class="row mb-5">
                         <div class="col-md-6">
                             <h5 class="text-muted">Total Products</h5>
@@ -35,15 +32,12 @@
                         </div>
                         <div class="col-md-6">
                             <h5 class="text-muted">Total Unique Vendors</h5>
-                            <!-- Note: This requires complex database annotation. For template simplicity, we just repeat the item count. 
-                                 A proper count would need to be passed from the view context. -->
                             <p class="h4 fw-bold">
                                 {{ unique_vendor_count }}
                             </p>
                         </div>
                     </div>
 
-                    <!-- List of Products in this Category -->
                     <h4 class="fw-bold mb-3" style="color: var(--primary-color);">Products in this Category</h4>
                     
                     <div class="table-responsive mb-5">
@@ -60,7 +54,6 @@
                                 {% for item in items_in_category %}
                                 <tr>
                                     <td class="fw-semibold">
-                                        <!-- Link to the Product Detail View -->
                                         <a href="{% url 'product-detail' item.slug %}" class="text-decoration-none" style="color: var(--primary-color);">
                                             {{ item.name }}
                                         </a>
@@ -84,7 +77,6 @@
                         </table>
                     </div>
 
-                    <!-- Action Buttons -->
                     <div class="d-flex gap-3 justify-content-end pt-3 border-top">
                         <a href="{% url 'category-list' %}" class="btn btn-outline-secondary rounded-pill">
                             <i class="fa-solid fa-list me-1"></i> Back to List

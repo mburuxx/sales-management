@@ -18,7 +18,6 @@ from django_extensions.db.fields import AutoSlugField
 from phonenumber_field.modelfields import PhoneNumberField
 from accounts.models import Vendor, Customer
 
-
 class Category(models.Model):
     """
     Represents a category for items.

@@ -14,13 +14,13 @@
 
     <style>
         :root {
-            --sidebar-bg: #111827; /* Dark Blue/Black */
-            --sidebar-header-bg: #0d131f; /* Used for NEW Top Nav Background */
+            --sidebar-bg: #111827;
+            --sidebar-header-bg: #0d131f;
             --sidebar-link-color: #9ca3af;
-            --sidebar-active-bg: #06b6d4; /* A cool, vibrant blue for active states */
-            --content-bg: #f9fafb; /* Light Gray */
+            --sidebar-active-bg: #06b6d4;
+            --content-bg: #f9fafb;
             --card-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
-            --primary-color: #0d6efd; /* Standard Bootstrap Blue (Used for accents) */
+            --primary-color: #0d6efd;
         }
 
         body {
@@ -28,18 +28,13 @@
             font-family: 'Inter', sans-serif;
         }
         
-        /* #wrapper no longer needs margin-left, it will take full width */
-        /* We can remove the entire #wrapper block as it's just a full-width container now */
-        
-        /* Top navigation bar (OLD WHITE NAVBAR STYLES) - These are now overridden/unused by the dark navbar */
         .top-navbar {
             background-color: #fff;
             box-shadow: var(--card-shadow);
         }
         
-        /* NEW DARK NAVBAR STYLES (Copied from previous response and adjusted to use variables) */
         .app-navbar {
-            background-color: var(--sidebar-header-bg); /* Use dark variable */
+            background-color: var(--sidebar-header-bg);
             border-bottom: 1px solid #374151;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         }
@@ -70,19 +65,16 @@
             border-bottom: 3px solid var(--primary-color);
         }
         
-        /* Ensure mobile toggler icon is visible on dark background */
         .app-navbar .navbar-toggler-icon {
             filter: invert(1);
         }
 
-        /* General Card Styling */
         .card {
             border: none;
             box-shadow: var(--card-shadow);
             border-radius: 0.5rem;
         }
         
-        /* Button Styling */
         .btn {
             border-radius: 0.375rem;
             transition: all 0.2s ease-in-out;
@@ -93,7 +85,6 @@
             box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
         }
 
-        /* Form styling */
         .form-control, .form-select {
             border-radius: 0.375rem;
         }

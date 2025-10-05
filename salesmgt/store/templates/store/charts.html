@@ -8,7 +8,6 @@
 
     <div class="row">
         
-        {# CHART 1: Top 5 Selling Items (Bar Chart) #}
         <div class="col-md-6 col-lg-6 mb-4">
             <div class="card shadow border-0">
                 <div class="card-body">
@@ -20,7 +19,6 @@
             </div>
         </div>
         
-        {# CHART 2: Delivery Status (Polar Area Chart) #}
         <div class="col-md-6 col-lg-6 mb-4">
             <div class="card shadow border-0">
                 <div class="card-body">
@@ -32,7 +30,6 @@
             </div>
         </div>
         
-        {# CHART 3: Top 5 Spending Vendors (Horizontal Bar Chart) #}
         <div class="col-md-6 col-lg-6 mb-4">
             <div class="card shadow border-0">
                 <div class="card-body">
@@ -44,7 +41,6 @@
             </div>
         </div>
 
-        {# CHART 4: Inventory Health (Radar Chart) #}
         <div class="col-md-6 col-lg-6 mb-4">
             <div class="card shadow border-0">
                 <div class="card-body">
@@ -60,12 +56,10 @@
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        // FUNCTION TO READ CSS VARIABLES IN JS
         function getCssVariable(name) {
             return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
         }
 
-        // 1. READ PRIMARY COLORS DYNAMICALLY
         const primaryColor = getCssVariable('--primary-color'); 
         const activeColor = getCssVariable('--sidebar-active-bg');
         
@@ -75,8 +69,8 @@
         const COLOR_GOLD = '#FBBF24';
         const COLOR_LIME = '#84CC16';
         const COLOR_INDIGO = '#4F46E5';
-        const COLOR_EMERALD = '#10B981'; // Retained as a vibrant hue, not 'Success'
-        const COLOR_ORANGE = '#F97316'; // Retained as a vibrant hue, not 'Danger'
+        const COLOR_EMERALD = '#10B981';
+        const COLOR_ORANGE = '#F97316';
 
         const dynamicColors = [
             COLOR_VIOLET,
@@ -89,7 +83,6 @@
             COLOR_ORANGE,
         ];
 
-        // --- CHART 1: Top 5 Selling Items (Bar Chart) ---
         var ctxBar = document.getElementById('barChartTopItems').getContext('2d');
         new Chart(ctxBar, {
             type: 'bar',
@@ -98,7 +91,7 @@
                 datasets: [{
                     label: 'Quantity Sold',
                     data: JSON.parse('{{ top_items_quantities|safe }}'),
-                    backgroundColor: dynamicColors[5], // Success Green
+                    backgroundColor: dynamicColors[5],
                     borderColor: dynamicColors[5],
                     borderWidth: 1
                 }]
@@ -115,7 +108,6 @@
             }
         });
 
-        // --- CHART 2: Delivery Status (Polar Area Chart) ---
         var ctxPolar = document.getElementById('polarAreaChartDelivery').getContext('2d');
         new Chart(ctxPolar, {
             type: 'polarArea',
@@ -123,7 +115,7 @@
                 labels: JSON.parse('{{ delivery_status_labels|safe }}'),
                 datasets: [{
                     data: JSON.parse('{{ delivery_status_counts|safe }}'),
-                    backgroundColor: [dynamicColors[2], dynamicColors[4]], // Green (Success), Red (Pending)
+                    backgroundColor: [dynamicColors[2], dynamicColors[4]],
                     borderColor: 'rgba(255, 255, 255, 1)',
                     borderWidth: 1
                 }]
@@ -138,7 +130,6 @@
             }
         });
         
-        // --- CHART 3: Top 5 Spending Vendors (Horizontal Bar Chart) ---
         var ctxHBar = document.getElementById('horizontalBarChartVendors').getContext('2d');
         new Chart(ctxHBar, {
             type: 'bar',
@@ -147,13 +138,13 @@
                 datasets: [{
                     label: 'Total Value Spent ($)',
                     data: JSON.parse('{{ top_vendors_values|safe }}'),
-                    backgroundColor: dynamicColors[7], // Danger Red
+                    backgroundColor: dynamicColors[7],
                     borderColor: dynamicColors[7],
                     borderWidth: 1
                 }]
             },
             options: {
-                indexAxis: 'y', // Makes it a horizontal bar chart
+                indexAxis: 'y',
                 responsive: true,
                 maintainAspectRatio: false,
                 scales: {
@@ -165,18 +156,17 @@
             }
         });
 
-        // --- CHART 4: Inventory Health (Radar Chart) ---
         var ctxRadar = document.getElementById('radarChartInventory').getContext('2d');
         new Chart(ctxRadar, {
             type: 'radar',
             data: {
-                labels: JSON.parse('{{ inventory_health_labels|safe }}'), // Categories
+                labels: JSON.parse('{{ inventory_health_labels|safe }}'),
                 datasets: [
                     {
                         label: 'Relative Quantity Count',
                         data: JSON.parse('{{ inventory_health_quantities|safe }}'),
                         fill: true,
-                        backgroundColor: primaryColor + '40', // Light primary fill
+                        backgroundColor: primaryColor + '40',
                         borderColor: primaryColor,
                         pointBackgroundColor: primaryColor,
                         pointBorderColor: '#fff',
@@ -187,7 +177,7 @@
                         label: 'Relative Total Value',
                         data: JSON.parse('{{ inventory_health_values|safe }}'),
                         fill: true,
-                        backgroundColor: dynamicColors[1] + '40', // Light secondary fill
+                        backgroundColor: dynamicColors[1] + '40',
                         borderColor: dynamicColors[1],
                         pointBackgroundColor: dynamicColors[1],
                         pointBorderColor: '#fff',
@@ -206,7 +196,7 @@
                     r: {
                         angleLines: { display: false },
                         suggestedMin: 0,
-                        suggestedMax: 100, // Normalized to 100 for comparison
+                        suggestedMax: 100,
                         pointLabels: { font: { size: 12 } }
                     }
                 }

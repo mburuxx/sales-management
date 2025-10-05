@@ -13,6 +13,7 @@ and querying functionalities.
 # Standard library imports
 import operator
 from functools import reduce
+import json
 
 # Django core imports
 from django.shortcuts import render
@@ -44,23 +45,18 @@ from .models import Category, Item, Delivery
 from .forms import ItemForm, CategoryForm, DeliveryForm
 from .tables import ItemTable
 from .mixins import PermissionDeniedMixin
-from accounts.models import UserRole
-
-
-import json # <-- ADD THIS IMPORT
+from accounts.models import UserRole, Customer
 
 # Helper function for normalization (for Radar Chart)
 def normalize_data(data):
     """Normalizes a list of values to a 0-100 scale."""
     if not data:
         return []
-    # Convert data to floats and handle None
     data = [float(d) if d is not None else 0.0 for d in data] 
     
     max_val = max(data)
     if max_val == 0:
         return [0] * len(data)
-    # Normalize: (value / max_value) * 100
     return [round((x / max_val) * 100) for x in data]
 
 
@@ -69,7 +65,6 @@ def dashboard(request):
     profiles = Profile.objects.all()
     items = Item.objects.all()
     
-    # 1. Dashboard Cards Data (Kept from previous iteration)
     total_items = (
         Item.objects.all()
         .aggregate(Sum("quantity"))
@@ -78,9 +73,6 @@ def dashboard(request):
     items_count = items.count()
     profiles_count = profiles.count()
     
-    # ------------------------------------------------------------------
-    # 2. CHART 1: Top 5 Selling Items (Bar Chart)
-    # ------------------------------------------------------------------
     top_items_data = SaleDetail.objects.values('item__name').annotate(
         total_qty_sold=Sum('quantity')
     ).order_by('-total_qty_sold')[:5]
@@ -88,38 +80,25 @@ def dashboard(request):
     top_items_labels = [item['item__name'] for item in top_items_data]
     top_items_quantities = [item['total_qty_sold'] for item in top_items_data]
 
-    # ------------------------------------------------------------------
-    # 3. CHART 2: Delivery Status Distribution (Polar Area Chart)
-    # ------------------------------------------------------------------
     delivery_status_data = Purchase.objects.values('delivery_status').annotate(
         count=Count('delivery_status')
     ).order_by('delivery_status')
 
-    # FIX: Access choices via the field itself, not the global variable
-    # This is the correct, robust way to get the choices tuple.
     status_map = dict(Purchase._meta.get_field('delivery_status').choices)
 
-    # Map status codes to display names
     delivery_status_labels = [status_map.get(d['delivery_status'], d['delivery_status']) for d in delivery_status_data]
     delivery_status_counts = [d['count'] for d in delivery_status_data]
 
-    # ------------------------------------------------------------------
-    # 4. CHART 3: Top 5 Spending Vendors (Horizontal Bar Chart)
-    # ------------------------------------------------------------------
     top_vendors_data = Purchase.objects.values('vendor__name').annotate(
         total_spent=Sum('total_value')
     ).order_by('-total_spent')[:5]
 
     top_vendors_labels = [v['vendor__name'] for v in top_vendors_data]
-    # Ensure conversion to float for JSON/Chart.js
     top_vendors_values = [float(v['total_spent']) for v in top_vendors_data] 
 
-    # ------------------------------------------------------------------
-    # 5. CHART 4: Inventory Health by Category (Radar Chart)
-    # ------------------------------------------------------------------
     inventory_health_data = Category.objects.annotate(
         total_quantity=Sum('item__quantity'),
-        total_value=Sum('item__quantity') * Sum('item__price') # A simplified proxy for inventory value
+        total_value=Sum('item__quantity') * Sum('item__price')
     ).values('name', 'total_quantity', 'total_value')
 
     inventory_health_labels = [i['name'] for i in inventory_health_data]
@@ -127,16 +106,10 @@ def dashboard(request):
     raw_quantities = [i['total_quantity'] or 0 for i in inventory_health_data]
     raw_values = [i['total_value'] or 0 for i in inventory_health_data]
 
-    # Normalize data to 0-100 scale for comparison on the Radar Chart
     inventory_health_quantities = normalize_data(raw_quantities)
     inventory_health_values = normalize_data(raw_values)
     
-    # ------------------------------------------------------------------
-    # 6. JSON Serialization
-    # ------------------------------------------------------------------
-    
     context = {
-        # Card data
         "items": items,
         "profiles": profiles,
         "profiles_count": profiles_count,
@@ -162,10 +135,6 @@ def dashboard(request):
         "inventory_health_labels": json.dumps(inventory_health_labels),
         "inventory_health_quantities": json.dumps(inventory_health_quantities),
         "inventory_health_values": json.dumps(inventory_health_values),
-        
-        # Retained but unused old chart variables (just in case)
-        # "categories": json.dumps([]),
-        # "category_counts": json.dumps([]),
     }
     
     return render(request, "store/dashboard.html", context)
@@ -278,11 +247,9 @@ class ProductUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     # Custom permission handling
     permission_denied_message = "You must have admin status to update inventory items."
     
-    # 2. Prevent raising 403, allowing handle_no_permission to execute
     raise_exception = False 
 
     def test_func(self):
-        # Only allow superusers to access this page
         return self.request.user.is_superuser
 
     def handle_no_permission(self):
@@ -292,10 +259,9 @@ class ProductUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         """
         context = {
             'message': self.permission_denied_message,
-            'redirect_url': reverse_lazy('dashboard'), # Redirect to your dashboard URL name
-            'redirect_delay': 3 # Redirect after 3 seconds
+            'redirect_url': reverse_lazy('dashboard'), 
+            'redirect_delay': 3
         }
-        # Use render() to display the custom template with the message/redirect info
         return render(self.request, 'store/permission_denied.html', context, status=403)
 
 
@@ -376,15 +342,6 @@ class DeliveryDetailView(LoginRequiredMixin, DetailView):
     template_name = "store/delivery_detail.html"
 
 
-# store/views.py
-
-from django.views.generic.edit import CreateView
-from django.contrib.auth.mixins import LoginRequiredMixin
-from .models import Delivery
-from .forms import DeliveryForm
-from accounts.models import Customer
-# Assuming DeliveryCreateView is defined here
-
 class DeliveryCreateView(LoginRequiredMixin, CreateView):
     model = Delivery
     form_class = DeliveryForm
@@ -396,19 +353,13 @@ class DeliveryCreateView(LoginRequiredMixin, CreateView):
         customer = form.cleaned_data.get('existing_customer')
         
         if customer:
-            # Case A: Existing customer selected. Set the FK field.
             form.instance.customer = customer
         
         else:
-            # Case B: New customer details provided. Must create customer first.
-            
-            # Use form data to create a new Customer object
             new_customer = Customer.objects.create(
-                first_name=form.cleaned_data['new_customer_first_name'],
-                # We save new customer location in the Customer's 'address' field
-                address=form.cleaned_data['new_customer_location'],
-                phone=form.cleaned_data['new_customer_phone'],
-                # You can add logic for last_name/email if you add those to the form
+            first_name=form.cleaned_data['new_customer_first_name'],
+            address=form.cleaned_data['new_customer_location'],
+            phone=form.cleaned_data['new_customer_phone'],
             )
             
             # Set the new Customer object as the Foreign Key for the Delivery
@@ -484,13 +435,10 @@ class CategoryDetailView(LoginRequiredMixin, DetailView):
         context['items_in_category'] = items_in_category
         
         # 2. Efficiently count the number of unique vendors
-        # We query the Item model, filter by category, and count the distinct vendor_id values.
-        # .distinct() here operates on the QuerySet fields that are being aggregated/counted.
         unique_vendor_count = items_in_category.values('vendor').distinct().count()
         context['unique_vendor_count'] = unique_vendor_count
 
         return context
-
 
 class CategoryCreateView(LoginRequiredMixin, CreateView):
     model = Category
