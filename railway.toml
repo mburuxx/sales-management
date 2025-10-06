@@ -1,7 +1,11 @@
-# railway.toml
+[build]
+builder = "nixpacks"
 
 [deploy]
-# The startCommand is now handled by the Dockerfile's CMD
-healthcheckPath = "/health/" # Ensure this URL exists in your urls.py!
+startCommand = "python manage.py migrate && python manage.py collectstatic --noinput && gunicorn salesmgt.wsgi --log-file -"
+healthcheckPath = "/health/"
 healthcheckTimeout = 300
 restartPolicyType = "always"
+
+[environment]
+NIXPACKS_PYTHON_VERSION = "3.11"
