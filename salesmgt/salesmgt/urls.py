@@ -22,10 +22,10 @@ from .health import health_check
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('health/', health_check, name='health_check'),
     path('accounts/', include('accounts.urls')),
     path('', include('store.urls')),
     path('sales/', include('sales.urls')),
-    path('health/', health_check, name='health_check'),
 ]
 
 # Serve media files in development and production (through nginx in prod)

@@ -30,7 +30,14 @@ SECRET_KEY = config("SECRET_KEY")
 DEBUG = config("DEBUG", default=False, cast=bool)
 
 # ALLOWED_HOSTS configuration for Railway, Docker and production
-ALLOWED_HOSTS = config("ALLOWED_HOSTS", default="localhost,127.0.0.1").split(",")
+import os
+
+ALLOWED_HOSTS = [
+    'localhost',
+    '127.0.0.1',
+    '.railway.app',
+    'healthcheck.railway.app',  # <- this line is key
+]
 
 # Railway deployment
 RAILWAY_STATIC_URL = config("RAILWAY_STATIC_URL", default=None)
