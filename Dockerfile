@@ -1,53 +1,33 @@
-# Use Python 3.11 slim image for smaller size
-FROM python:3.11-slim
+FROM python:3.12-slim
 
-# Set environment variables
-ENV PYTHONDONTWRITEBYTECODE=1
-ENV PYTHONUNBUFFERED=1
-ENV DEBIAN_FRONTEND=noninteractive
-
-# Set work directory
-WORKDIR /app
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1
 
 # Install system dependencies
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends \
-        postgresql-client \
-        build-essential \
-        libpq-dev \
-        curl \
-        && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y \
+    libpq-dev gcc curl \
+    && rm -rf /var/lib/apt/lists/*
 
-# Create a non-root user
-RUN adduser --disabled-password --gecos '' appuser
+
+WORKDIR /app
+
+# Copy dependency files first (for better caching)
+COPY requirements.txt /app/
 
 # Install Python dependencies
-COPY requirements.txt /app/
-RUN pip install --no-cache-dir --upgrade pip \
-    && pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy project files
 COPY . /app/
 
-# Create necessary directories
-RUN mkdir -p /app/staticfiles /app/media /app/logs
-
-# Set proper permissions
-RUN chown -R appuser:appuser /app
+# Create non-root user
+RUN useradd -m appuser && chown -R appuser:appuser /app
 USER appuser
 
-# Change to Django project directory
 WORKDIR /app/salesmgt
 
-# Collect static files (will be overridden in production)
-RUN python manage.py collectstatic --noinput --clear || true
-
-# Expose port
 EXPOSE 8000
 
-# Health check
 HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:8000/admin/ || exit 1
+  CMD curl -f http://localhost:8000/health/ || exit 1
 
-# Default command
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "--workers", "2", "--timeout", "120", "salesmgt.wsgi:application"]
+CMD ["gunicorn", "salesmgt.wsgi:application", "--bind", "0.0.0.0:8000"]
