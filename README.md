@@ -7,6 +7,8 @@ A Django-based sales management application for handling inventory, sales transa
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Database-blue)
 ![License](https://img.shields.io/badge/License-MIT-yellow)
 
+🌐 **Live Demo:** [View Deployed Site](https://salesmgt.up.railway.app/)  
+
 ## 📋 Table of Contents
 
 - [Features](#features)
