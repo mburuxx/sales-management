@@ -2,7 +2,7 @@
 builder = "nixpacks"
 
 [deploy]
-startCommand = "python manage.py migrate && python manage.py collectstatic --noinput && gunicorn salesmgt.wsgi --log-file -"
+startCommand = "cd salesmgt && python manage.py migrate && python manage.py collectstatic --noinput && gunicorn salesmgt.wsgi --log-file - --bind 0.0.0.0:$PORT"
 healthcheckPath = "/health/"
 healthcheckTimeout = 300
 restartPolicyType = "always"
