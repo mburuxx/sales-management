@@ -1,21 +1,18 @@
 #!/bin/bash
-set -e
+# start.sh
 
-echo "🚀 Starting Sales Management System..."
+# Change to the Django project directory
+cd /app/salesmgt
 
-# Navigate to Django project
-cd salesmgt
-
-echo "📊 Running database migrations..."
+# Apply database migrations
+echo "Applying database migrations..."
 python manage.py migrate --noinput
 
-echo "📁 Collecting static files..."
-python manage.py collectstatic --noinput --clear
+# Collect static files
+echo "Collecting static files..."
+python manage.py collectstatic --noinput
 
-echo "🌐 Starting web server..."
-exec gunicorn salesmgt.wsgi:application \
-    --bind 0.0.0.0:$PORT \
-    --workers 2 \
-    --timeout 120 \
-    --log-file - \
-    --log-level info
+# Start Gunicorn server
+echo "Starting Gunicorn..."
+# Use the same command from your Dockerfile's CMD
+exec gunicorn --bind 0.0.0.0:8000 --workers 2 --timeout 120 salesmgt.wsgi:application

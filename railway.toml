@@ -2,8 +2,10 @@
 builder = "nixpacks"
 
 [deploy]
+# Use a simple command to start the application using the new start.sh script.
+# This script will handle the migrations and static file collection first.
 startCommand = "./start.sh"
-healthcheckPath = "/"
+healthcheckPath = "/health/"
 healthcheckTimeout = 300
 restartPolicyType = "always"
 
