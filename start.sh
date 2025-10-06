@@ -1,18 +1,20 @@
-#!/bin/bash
-# start.sh
+#!/bin/sh
+# Exit immediately if a command exits with a non-zero status.
+set -e
 
-# Change to the Django project directory
+# Change to the directory containing manage.py
 cd /app/salesmgt
 
-# Apply database migrations
+# Run database migrations
 echo "Applying database migrations..."
-python manage.py migrate --noinput
+python manage.py migrate
 
 # Collect static files
 echo "Collecting static files..."
 python manage.py collectstatic --noinput
 
-# Start Gunicorn server
+# Start Gunicorn server from the project root directory
+# The wsgi module is located at salesmgt.wsgi
+cd /app
 echo "Starting Gunicorn..."
-# Use the same command from your Dockerfile's CMD
-exec gunicorn --bind 0.0.0.0:8000 --workers 2 --timeout 120 salesmgt.wsgi:application
+gunicorn salesmgt.wsgi:application --bind 0.0.0.0:$PORT --workers 3 --log-file -

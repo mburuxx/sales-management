@@ -1,13 +1,7 @@
-[build]
-builder = "nixpacks"
+# railway.toml
 
 [deploy]
-# Use a simple command to start the application using the new start.sh script.
-# This script will handle the migrations and static file collection first.
-startCommand = "./start.sh"
-healthcheckPath = "/health/"
+# The startCommand is now handled by the Dockerfile's CMD
+healthcheckPath = "/health/" # Ensure this URL exists in your urls.py!
 healthcheckTimeout = 300
 restartPolicyType = "always"
-
-[environment]
-NIXPACKS_PYTHON_VERSION = "3.11"
