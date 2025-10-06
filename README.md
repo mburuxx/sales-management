@@ -1,6 +1,6 @@
 # Sales Management System
 
-A comprehensive Django-based sales management application for handling inventory, sales transactions, customer management, and business analytics.
+A Django-based sales management application for handling inventory, sales transactions, customer management, and business analytics.
 
 ![Python](https://img.shields.io/badge/Python-3.8+-blue)
 ![Django](https://img.shields.io/badge/Django-5.2+-green)
@@ -338,7 +338,7 @@ The API returns JSON responses in the following format:
 
 ## 🧪 Testing
 
-The application includes comprehensive test suites for all major components.
+The application includes test suites for all major components.
 
 ### Running Tests
 
@@ -363,7 +363,7 @@ coverage html  # Generate HTML report
 
 ### Test Structure
 
-Each app includes comprehensive tests:
+Each app includes tests:
 
 - **Model Tests**: Database models, validations, relationships
 - **Form Tests**: Form validation, widget configuration
@@ -373,8 +373,6 @@ Each app includes comprehensive tests:
 - **Admin Tests**: Admin interface functionality
 
 ### Test Coverage
-
-The test suite aims for >90% code coverage across all modules:
 
 ```bash
 # Generate coverage report
@@ -599,24 +597,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - **Documentation**: Check this README and code comments
 - **Community**: Join our discussions
 
-## 📊 Performance
-
-### Optimization Tips
-
-1. **Database Optimization**
-   - Use database indexes for frequently queried fields
-   - Implement pagination for large datasets
-   - Use select_related() and prefetch_related() for queries
-
-2. **Caching**
-   - Implement Redis for session storage
-   - Cache frequently accessed data
-   - Use template fragment caching
-
-3. **Static Files**
-   - Use CDN for static file delivery
-   - Compress CSS and JavaScript
-   - Optimize images
 
 ## 🔒 Security
 
