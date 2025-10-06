@@ -18,18 +18,19 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from .health import health_check
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('accounts.urls')),
     path('', include('store.urls')),
     path('sales/', include('sales.urls')),
+    path('health/', health_check, name='health_check'),
 ]
 
+# Serve media files in development and production (through nginx in prod)
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
 if settings.DEBUG:
-    # It is good practice to add static files too, even if you are only 
-    # seeing issues with the media handler.
+    # Serve static files in development
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
-    
-    # This is the line that was causing the conflict:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

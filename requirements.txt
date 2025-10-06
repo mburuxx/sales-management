@@ -1,13 +1,30 @@
-Django
-psycopg2-binary
-python-decouple
-django-imagekit
-Pillow
-django-phonenumber-field
-phonenumbers
-django-extensions
-django-tables2
-tablib
-django-filter
-django-crispy-forms
-crispy-bootstrap5 
+# Core Django
+Django>=5.2,<5.3
+psycopg2-binary>=2.9.7
+python-decouple>=3.8
+
+# Django Extensions
+django-imagekit>=5.0.0
+Pillow>=10.0.0
+django-phonenumber-field>=7.1.0
+phonenumbers>=8.13.0
+django-extensions>=3.2.0
+django-tables2>=2.6.0
+tablib>=3.5.0
+django-filter>=23.0
+django-crispy-forms>=2.0
+crispy-bootstrap5>=0.7
+
+# Production Dependencies
+gunicorn>=21.2.0
+whitenoise>=6.6.0
+django-redis>=5.4.0
+redis>=5.0.0
+
+# Development Dependencies (optional)
+coverage>=7.3.0
+flake8>=6.1.0
+black>=23.9.0
+
+# Security
+django-cors-headers>=4.3.0 
