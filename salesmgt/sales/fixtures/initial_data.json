@@ -3,10 +3,8 @@
     "model": "auth.user",
     "pk": 1,
     "fields": {
-      "username": "admin_user",
+      "username": "fake_user",
       "email": "admin@store.com",
-      "is_staff": true,
-      "is_superuser": true,
       "password": "pbkdf2_sha256$260000$g7hI4gqU3jK2iL5oP9rS1tVwXyZ0aBcD$mFvKjHlOpQwRsTxYuZwAxByCzD0eF1gH2iJ3kL4mN5oP6qR7sT8uV9wXyZ0aB",
       "last_login": "2024-01-01T00:00:00Z",
       "date_joined": "2024-01-01T00:00:00Z"

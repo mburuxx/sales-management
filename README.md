@@ -7,8 +7,11 @@ A comprehensive Django-based sales management application for handling inventory
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Database-blue)
 ![License](https://img.shields.io/badge/License-MIT-yellow)
 
+> **🚀 For Production Deployment**: This branch (`main`) is optimized for development. For Docker containerization and production deployment to DigitalOcean, AWS, or other cloud platforms, see the [`production` branch](../../tree/production) which includes Docker configurations, deployment scripts, and production-ready settings.
+
 ## 📋 Table of Contents
 
+- [Quick Start](#quick-start)
 - [Features](#features)
 - [Tech Stack](#tech-stack)
 - [Prerequisites](#prerequisites)
@@ -17,11 +20,47 @@ A comprehensive Django-based sales management application for handling inventory
 - [Database Setup](#database-setup)
 - [Running the Application](#running-the-application)
 - [Project Structure](#project-structure)
-- [API Documentation](#api-documentation)
 - [Testing](#testing)
-- [Deployment](#deployment)
+- [Development](#development)
+- [Production Deployment](#production-deployment)
 - [Contributing](#contributing)
 - [License](#license)
+
+## 🚀 Quick Start
+
+### Prerequisites
+- Python 3.8+
+- PostgreSQL 12+
+- Git
+
+### Installation
+```bash
+# Clone the repository
+git clone https://github.com/mburuxx/sales-management.git
+cd sales-management
+
+# Create virtual environment
+python -m venv venv
+source venv/bin/activate  # Linux/macOS
+# venv\Scripts\activate   # Windows
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Configure environment
+cp .env.example .env
+# Edit .env with your database settings
+
+# Setup database
+cd salesmgt
+python manage.py migrate
+python manage.py createsuperuser
+
+# Run development server
+python manage.py runserver
+```
+
+Visit http://127.0.0.1:8000/ to access the application.
 
 ## ✨ Features
 
@@ -158,16 +197,6 @@ DB_PASSWORD=your_db_password
 DB_HOST=localhost
 DB_PORT=5432
 
-# Email Configuration (Optional)
-EMAIL_HOST=smtp.gmail.com
-EMAIL_PORT=587
-EMAIL_HOST_USER=your-email@example.com
-EMAIL_HOST_PASSWORD=your-email-password
-EMAIL_USE_TLS=True
-
-# Media and Static Files
-MEDIA_ROOT=/path/to/media/files
-STATIC_ROOT=/path/to/static/files
 ```
 
 ### 2. Generate Secret Key
@@ -387,28 +416,62 @@ open htmlcov/index.html  # macOS
 xdg-open htmlcov/index.html  # Linux
 ```
 
-## 🚀 Deployment
+## 🚀 Production Deployment
 
-### Environment Preparation
+**For production deployment with Docker and cloud platforms:**
 
-1. **Production Settings**
-   ```python
-   # In settings.py or create settings_prod.py
-   DEBUG = False
-   ALLOWED_HOSTS = ['your-domain.com', 'www.your-domain.com']
-   
-   # Database configuration for production
-   DATABASES = {
-       'default': {
-           'ENGINE': 'django.db.backends.postgresql',
-           'NAME': config('PROD_DB_NAME'),
-           'USER': config('PROD_DB_USER'),
-           'PASSWORD': config('PROD_DB_PASSWORD'),
-           'HOST': config('PROD_DB_HOST'),
-           'PORT': config('PROD_DB_PORT'),
-       }
-   }
-   ```
+👉 **Switch to the [`production` branch](../../tree/production)** which includes:
+
+- **Docker Configuration**: Complete containerization with Docker Compose
+- **Production Settings**: Optimized Django settings for production
+- **Railway Deployment**: One-click deployment to Railway.app (free tier available)
+- **DigitalOcean Scripts**: Automated deployment to DigitalOcean droplets
+- **Nginx Setup**: Reverse proxy with caching and security
+- **Redis Integration**: Caching and session management
+- **Monitoring**: Health checks and logging
+- **Security**: Production-ready security configurations
+
+### Quick Production Deployment
+
+#### Railway (Recommended - Free Tier Available)
+```bash
+# Install Railway CLI
+npm install -g @railway/cli
+
+# Run automated deployment
+./scripts/deploy-railway.sh
+
+# Or follow the detailed guide
+cat RAILWAY.md
+```
+
+#### Docker + DigitalOcean
+```bash
+# Switch to production branch (already on production)
+git checkout production
+
+# Follow the production setup guide
+cat NEXT-STEPS.md
+```
+
+The production branch provides:
+- **Railway.app integration** (free PostgreSQL included)
+- One-click deployment scripts
+- Docker containerization
+- Cloud platform integration
+- Scalable architecture ready for invoice/billing apps
+
+### Development vs Production
+
+| Aspect | Main Branch (Development) | Production Branch |
+|--------|---------------------------|-------------------|
+| **Purpose** | Local development | Production deployment |
+| **Setup** | Traditional Django | Docker containers |
+| **Database** | Local PostgreSQL | Containerized PostgreSQL |
+| **Static Files** | Django dev server | Nginx with caching |
+| **Caching** | None | Redis |
+| **Security** | Development settings | Production security |
+| **Monitoring** | Basic logging | Health checks, metrics |
 
 2. **Collect Static Files**
    ```bash

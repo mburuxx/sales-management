@@ -1,0 +1,11 @@
+[build]
+builder = "nixpacks"
+
+[deploy]
+startCommand = "python manage.py migrate && python manage.py collectstatic --noinput && gunicorn salesmgt.wsgi --log-file -"
+healthcheckPath = "/health/"
+healthcheckTimeout = 300
+restartPolicyType = "always"
+
+[environment]
+NIXPACKS_PYTHON_VERSION = "3.11"
