@@ -41,6 +41,8 @@ ALLOWED_HOSTS = [
     '.railway.app',
     'healthcheck.railway.app',
     '.up.railway.app',
+    'https://sales-management-production-d042.up.railway.app'
+
 
 ]
 
