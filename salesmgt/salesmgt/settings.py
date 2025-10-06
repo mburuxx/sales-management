@@ -41,7 +41,7 @@ ALLOWED_HOSTS = [
     '.railway.app',
     'healthcheck.railway.app',
     '.up.railway.app',
-    'https://sales-management-production-d042.up.railway.app'
+    'sales-management-production-d042.up.railway.app'
 
 
 ]
@@ -59,6 +59,7 @@ if "RAILWAY_ENVIRONMENT" in os.environ:
 CSRF_TRUSTED_ORIGINS = [
     'https://*.railway.app',
     'https://*.up.railway.app',
+    'https://sales-management-production-d042.up.railway.app',
 ]
 
 # Only require HTTPS redirect in production with custom domains
