@@ -39,7 +39,9 @@ ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
     '.railway.app',
-    'healthcheck.railway.app',  # <- this line is key
+    'healthcheck.railway.app',
+    '.up.railway.app',
+
 ]
 
 # Railway deployment
@@ -51,6 +53,14 @@ if RAILWAY_STATIC_URL:
 if "RAILWAY_ENVIRONMENT" in os.environ:
     ALLOWED_HOSTS.append(".railway.app")
 
+# CSRF settings for Railway
+CSRF_TRUSTED_ORIGINS = [
+    'https://*.railway.app',
+    'https://*.up.railway.app',
+]
+
+# Only require HTTPS redirect in production with custom domains
+SECURE_SSL_REDIRECT = config('SECURE_SSL_REDIRECT', default=False, cast=bool)
 
 # Application definition
 
