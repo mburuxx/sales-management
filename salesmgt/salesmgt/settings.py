@@ -115,18 +115,17 @@ else:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
-            'NAME': config('DB_NAME', default='railway'),
-            'USER': config('DB_USER', default='postgres'),
-            'PASSWORD': config('DB_PASSWORD', default=''),
-            'HOST': config('DB_HOST', default='localhost'),
-            'PORT': config('DB_PORT', default='5432'),
-            'CONN_MAX_AGE': 60,  # Connection pooling
+            'NAME': config('PGDATABASE', default=config('DB_NAME', default='railway')),
+            'USER': config('PGUSER', default=config('DB_USER', default='postgres')),
+            'PASSWORD': config('PGPASSWORD', default=config('DB_PASSWORD', default='')),
+            'HOST': config('PGHOST', default=config('DB_HOST', default='localhost')),
+            'PORT': config('PGPORT', default=config('DB_PORT', default='5432')),
+            'CONN_MAX_AGE': 60,
             'OPTIONS': {
                 'connect_timeout': 10,
             }
         }
     }
-
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
 
